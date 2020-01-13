@@ -1,0 +1,4 @@
+- Add performance metrics (ROC, PR) for binary classification
+- Add linear regression
+- Resolve scalstyle warnings (look into typical line char limits for Scala)
+- Add scalastyle checks to git commit hook
