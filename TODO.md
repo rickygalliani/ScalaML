@@ -1,3 +1,8 @@
+- Fix VotedPerceptron
+- Use case classes in implementation of VotedPerceptron?
+- Add pocket convergence for normal Perceptron
+- Add linearly inseparable test cases for Perceptron and VotedPerceptron
+- Load test both classes with 10,000 training examples
 - Add performance metrics (ROC, PR) for binary classification
 - Add linear regression
 - Resolve scalstyle warnings (look into typical line char limits for Scala)
