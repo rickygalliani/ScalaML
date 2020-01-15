@@ -44,10 +44,9 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
         return weights
       }
       // Update current weights: w = w + x * y where (x, y) is a random misclassified example
-      val misclassifiedExs = Perceptron.misclassifiedExamples(curWeights, examples)
-      val randomMisclassifiedEx = misclassifiedExs(random.nextInt(misclassifiedExs.length))
-      val X = List(1.0) ::: randomMisclassifiedEx.featureVector
-      val dw = X.map(_ * randomMisclassifiedEx.label)
+      val mistakes = Perceptron.misclassifiedExamples(curWeights, examples)
+      val randomMistake = mistakes(random.nextInt(mistakes.length))
+      val dw = (List(1.0) ::: randomMistake.featureVector).map(_ * randomMistake.label)
       val newCurWeights = curWeights.zip(dw).map { case (w, d) => w + d }
       // Add current weights to set of past weights
       val oldWeights = curWeightVotes.weights
