@@ -70,4 +70,32 @@ class VotedPerceptronSpec extends FunSuite {
     assert(vp.linearlySeparates(examples) == true)
     assert(vp.misclassifiedExamples(examples).isEmpty)
   }
+
+  test("train(): linear inseparable case 1: 2 same points, 2 classes") {
+    val vp = new VotedPerceptron()
+    val examples = List(
+      new Example(List(1.0, 1.0, 1.0), 1),
+      new Example(List(1.0, 1.0, 1.0), -1)
+    )
+    vp.train(examples)
+    assert(vp.linearlySeparates(examples) == false)
+    assert(vp.misclassifiedExamples(examples).length == 1)
+  }
+
+  test("train(): linear inseparable case 1: 1 outlier") {
+    val vp = new VotedPerceptron()
+    val examples = List(
+      new Example(List(1.0, 1.0, 1.0), 1),
+      new Example(List(1.0, 1.0, 1.0), 1),
+      new Example(List(1.0, 1.0, 1.0), 1),
+      new Example(List(-1.0, -1.0, -1.0), -1),
+      new Example(List(-1.0, -1.0, -1.0), -1),
+      new Example(List(-1.0, -1.0, -1.0), -1),
+      new Example(List(-1.0, -1.0, -1.0), 1)  // outlier
+    )
+    vp.train(examples)
+    assert(vp.linearlySeparates(examples) == false)
+    assert(vp.misclassifiedExamples(examples).length == 1)
+  }
+
 }

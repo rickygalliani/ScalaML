@@ -69,4 +69,32 @@ class PerceptronSpec extends FunSuite {
     assert(p.linearlySeparates(examples) == true)
     assert(p.misclassifiedExamples(examples).isEmpty)
   }
+
+  test("train(): linear inseparable case 1: 2 same points, 2 classes") {
+    val p = new Perceptron()
+    val examples = List(
+      new Example(List(1.0, 1.0, 1.0), 1),
+      new Example(List(1.0, 1.0, 1.0), -1)
+    )
+    p.train(examples)
+    assert(p.linearlySeparates(examples) == false)
+    assert(p.misclassifiedExamples(examples).length == 1)
+  }
+
+  test("train(): linear inseparable case 1: 1 outlier") {
+    val p = new Perceptron()
+    val examples = List(
+      new Example(List(1.0, 1.0, 1.0), 1),
+      new Example(List(1.0, 1.0, 1.0), 1),
+      new Example(List(1.0, 1.0, 1.0), 1),
+      new Example(List(-1.0, -1.0, -1.0), -1),
+      new Example(List(-1.0, -1.0, -1.0), -1),
+      new Example(List(-1.0, -1.0, -1.0), -1),
+      new Example(List(-1.0, -1.0, -1.0), 1)  // outlier
+    )
+    p.train(examples)
+    assert(p.linearlySeparates(examples) == false)
+    assert(p.misclassifiedExamples(examples).length == 1)
+  }
+
 }
