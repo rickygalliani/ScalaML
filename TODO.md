@@ -1,6 +1,5 @@
-- Fix VotedPerceptron
-- Use case classes in implementation of VotedPerceptron?
 - Add pocket convergence for normal Perceptron
+- Add documentation for functions
 - Add linearly inseparable test cases for Perceptron and VotedPerceptron
 - Load test both classes with 10,000 training examples
 - Add performance metrics (ROC, PR) for binary classification

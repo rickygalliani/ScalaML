@@ -10,13 +10,12 @@ class Perceptron(var weights: List[Double] = List[Double]()) {
                      curIteration: Int,
                      maxIterations: Int): List[Double] = {
       if (curIteration > maxIterations) return weights
-      if (Perceptron.linearlySeparates(this, examples)) return weights
+      if (Perceptron.linearlySeparates(weights, examples)) return weights
       // Update weights: w = w + x * y where (x, y) is a random misclassified example
-      val misclassifiedExs = Perceptron.misclassifiedExamples(this, examples)
-      val randomChoice = random.nextInt(misclassifiedExs.length)
-      val randomMisclassifiedEx = misclassifiedExs(randomChoice)
+      val misclassifiedExs = Perceptron.misclassifiedExamples(weights, examples)
+      val randomMisclassifiedEx = misclassifiedExs(random.nextInt(misclassifiedExs.length))
       val X = List(1.0) ::: randomMisclassifiedEx.featureVector
-      val dw = X.map(x => x * randomMisclassifiedEx.label)
+      val dw = X.map(_ * randomMisclassifiedEx.label)
       weights = weights.zip(dw).map { case (w, d) => w + d }
       trainRecurse(examples, numExamples, curIteration + 1, maxIterations)
     }
@@ -29,6 +28,14 @@ class Perceptron(var weights: List[Double] = List[Double]()) {
   }
 
   def predict(example: Example): Int = Perceptron.predict(weights, example)
+
+  def linearlySeparates(examples: List[Example]): Boolean = {
+    Perceptron.linearlySeparates(weights, examples)
+  }
+
+  def misclassifiedExamples(examples: List[Example]): List[Example] = {
+    Perceptron.misclassifiedExamples(weights, examples)
+  }
 
 }
 
@@ -47,12 +54,12 @@ object Perceptron {
     if (score >= 0) 1 else -1
   }
 
-  def linearlySeparates(p: Perceptron, examples: List[Example]): Boolean = {
-    !examples.exists(ex => p.predict(ex) != ex.label)
+  def linearlySeparates(weights: List[Double], examples: List[Example]): Boolean = {
+    !examples.exists(ex => Perceptron.predict(weights, ex) != ex.label)
   }
 
-  def misclassifiedExamples(p: Perceptron, examples: List[Example]): List[Example] = {
-    examples.filter(ex => p.predict(ex) != ex.label)
+  def misclassifiedExamples(weights: List[Double], examples: List[Example]): List[Example] = {
+    examples.filter(ex => Perceptron.predict(weights, ex) != ex.label)
   }
 
 }
