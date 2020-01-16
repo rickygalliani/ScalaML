@@ -5,44 +5,35 @@ class Perceptron(var weights: List[Double] = List[Double]()) {
   private val random = new Random
 
   def train(examples: List[Example]): List[Double] = {
-    def trainRecurse(examples: List[Example],
-                     numExamples: Int,
-                     curIteration: Int,
-                     maxIterations: Int,
-                     bestWeightsSoFar: List[Double],
-                     fewestMistakesSoFar: Int): List[Double] = {
-      if (curIteration > maxIterations) {
+    def trainEpoch(examples: List[Example],
+                   numExamples: Int,
+                   curEpoch: Int,
+                   maxEpochs: Int,
+                   bestWeightsSoFar: List[Double],
+                   fewestMistakesSoFar: Int): List[Double] = {
+      if (curEpoch > maxEpochs) {
         weights = bestWeightsSoFar
         return weights
       }
       if (linearlySeparates(examples)) return weights
-      // Update weights: w = w + x * y where (x, y) is a random misclassified example
       val mistakes = misclassifiedExamples(examples)
       val numMistakes = mistakes.length
-      // println(s"weights = ${weights}")
-      // println(s"bestWeightsSoFar = $bestWeightsSoFar")
-      // println(s"fewestMistakesSoFar = $fewestMistakesSoFar")
-      // println(s"numMistakes = $numMistakes\n")
       // Prepare "pocket" data for next training step
-      val (newBestWeightsSoFar, newFewestMistakesSoFar) = {
+      val (newWeights, newMistakes) = {
         if (numMistakes <= fewestMistakesSoFar) (weights, numMistakes)
         else (bestWeightsSoFar, fewestMistakesSoFar)
       }
       val randomMistake = mistakes(random.nextInt(numMistakes))
       val dw = (List(1.0) ::: randomMistake.featureVector).map(_ * randomMistake.label)
+      // Update weights: w = w + x * y where (x, y) is a random misclassified example
       weights = weights.zip(dw).map { case (w, d) => w + d }
-      trainRecurse(examples,
-                   numExamples,
-                   curIteration + 1,
-                   maxIterations,
-                   newBestWeightsSoFar,
-                   newFewestMistakesSoFar)
+      trainEpoch(examples, numExamples, curEpoch + 1, maxEpochs, newWeights, newMistakes)
     }
     val numExamples = examples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
     // Training for the first time, initialize weights to 0.0, including bias term as w_0
     weights = List.fill(examples(0).featureVector.length + 1)(0.0)
-    trainRecurse(examples, numExamples, 1, numExamples * 10, weights, numExamples)
+    trainEpoch(examples, numExamples, 1, numExamples * 10, weights, numExamples)
   }
 
   def predict(example: Example): Int = Perceptron.predict(weights, example)

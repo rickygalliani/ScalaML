@@ -1,5 +1,5 @@
 - Load test both Perceptron classes with 10,000 training examples
 - Add performance metrics (ROC, PR) for binary classification
 - Add linear regression
-- Resolve scalstyle warnings (look into typical line char limits for Scala)
+- Resolve scalstyle warnings (or add Linter)
 - Add scalastyle checks to git commit hooks

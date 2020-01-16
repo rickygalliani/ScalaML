@@ -20,13 +20,13 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       - http://curtis.ml.cmu.edu/w/courses/index.php/Voted_Perceptron
   */
   def train(examples: List[Example]): List[(List[Double], Double)] = {
-    def trainRecurse(examples: List[Example],
-                     numExamples: Int,
-                     curIteration: Int,
-                     maxIterations: Int,
-                     curWeights: List[Double],
-                     curWeightVotes: WeightVotes): List[(List[Double], Double)] = {
-      if (curIteration > maxIterations) {
+    def trainEpoch(examples: List[Example],
+                   numExamples: Int,
+                   curEpoch: Int,
+                   maxEpochs: Int,
+                   curWeights: List[Double],
+                   curWeightVotes: WeightVotes): List[(List[Double], Double)] = {
+      if (curEpoch > maxEpochs) {
         weights = curWeightVotes.computeWeights()
         return weights
       }
@@ -52,12 +52,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       val oldWeights = curWeightVotes.weights
       val oldVotes = curWeightVotes.votes
       val newWeightVotes = WeightVotes(curWeights :: oldWeights, curVotes :: oldVotes)
-      trainRecurse(examples,
-                   numExamples,
-                   curIteration + 1,
-                   maxIterations,
-                   newCurWeights,
-                   newWeightVotes)
+      trainEpoch(examples, numExamples, curEpoch + 1, maxEpochs, newCurWeights, newWeightVotes)
     }
     val numExamples = examples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
@@ -65,7 +60,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
     val curWeights = List.fill(modDim)(0.0)
     val curWeightVotes = WeightVotes()
     weights = List((curWeights, 1.0))
-    trainRecurse(examples, numExamples, 1, numExamples * 10, curWeights, curWeightVotes)
+    trainEpoch(examples, numExamples, 1, numExamples * 10, curWeights, curWeightVotes)
   }
 
   def predict(example: Example): Int = VotedPerceptron.predict(weights, example)
