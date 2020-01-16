@@ -97,7 +97,7 @@ class PerceptronSpec extends FunSuite {
     assert(p.misclassifiedExamples(examples).length == 1)
   }
 
-  test("train() - load test 2: linearly inseparable case 2") {
+  test("train() - linearly inseparable case 2: several outliers") {
     val p = new Perceptron()
     val testSize = 50
     val numOutliers = 3
@@ -114,6 +114,27 @@ class PerceptronSpec extends FunSuite {
     p.train(examples)
     assert(p.linearlySeparates(examples) == false)
     assert(p.misclassifiedExamples(examples).length == numOutliers * 2)
+  }
+  
+  test("predict() - case 1: 3 dimensions, positive label") {
+    val p = new Perceptron()
+    p.weights = List(1.0, 2.0, 3.0)
+    val prediction = p.predict(List(1, 1))
+    assert(prediction == 1)
+  }
+
+  test("predict() - case 2: 3 dimensions, negative label") {
+    val p = new Perceptron()
+    p.weights = List(-1.0, -2.0, -3.0)
+    val prediction = p.predict(List(1, 1))
+    assert(prediction == -1)
+  }
+
+  test("predictBatch() - case 1: positive label, negative label") {
+    val p = new Perceptron()
+    p.weights = List(1.0, 2.0, 3.0)
+    val prediction = p.predictBatch(List(List(1, 1), List(-1, -1)))
+    assert(prediction == List(1, -1))
   }
 
 }

@@ -35,8 +35,8 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       var stillPerfect = true
       while (stillPerfect && curVotes < numExamples) {
         val example = examples(randExampleInds(curVotes))
-        val prediction = Perceptron.predict(curWeights, example)
-        stillPerfect = prediction == example.label
+        val prediction = Perceptron.predict(curWeights, example.X)
+        stillPerfect = prediction == example.y
         curVotes = if (stillPerfect) curVotes + 1 else curVotes
       }
       if (stillPerfect) {  // current weights linearly separate the dataset
@@ -46,7 +46,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       // Update current weights: w = w + x * y where (x, y) is a random misclassified example
       val mistakes = Perceptron.misclassifiedExamples(curWeights, examples)
       val randomMistake = mistakes(random.nextInt(mistakes.length))
-      val dw = (List(1.0) ::: randomMistake.featureVector).map(_ * randomMistake.label)
+      val dw = (List(1.0) ::: randomMistake.X).map(_ * randomMistake.y)
       val newCurWeights = curWeights.zip(dw).map { case (w, d) => w + d }
       // Add current weights to set of past weights
       val oldWeights = curWeightVotes.weights
@@ -56,14 +56,16 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
     }
     val numExamples = examples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
-    val modDim = examples(0).featureVector.length + 1
+    val modDim = examples(0).X.length + 1
     val curWeights = List.fill(modDim)(0.0)
     val curWeightVotes = WeightVotes()
     weights = List((curWeights, 1.0))
     trainEpoch(examples, numExamples, 1, numExamples * 10, curWeights, curWeightVotes)
   }
 
-  def predict(example: Example): Int = VotedPerceptron.predict(weights, example)
+  def predict(X: List[Double]): Int = VotedPerceptron.predict(weights, X)
+
+  def predictBatch(Xs: List[List[Double]]): List[Int] = Xs.map(predict)
 
   def linearlySeparates(examples: List[Example]): Boolean = {
     VotedPerceptron.linearlySeparates(weights, examples)
@@ -77,19 +79,19 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
 
 object VotedPerceptron {
 
-  def predict(weights: List[(List[Double], Double)], example: Example): Int = {
-    val score = weights.map { case (w, v) => Perceptron.predict(w, example) * v }.sum
+  def predict(weights: List[(List[Double], Double)], X: List[Double]): Int = {
+    val score = weights.map { case (w, v) => Perceptron.predict(w, X) * v }.sum
     if (score >= 0) 1 else -1
   }
 
   def linearlySeparates(weights: List[(List[Double], Double)],
                         examples: List[Example]): Boolean = {
-    !examples.exists(ex => VotedPerceptron.predict(weights, ex) != ex.label)
+    !examples.exists(ex => VotedPerceptron.predict(weights, ex.X) != ex.y)
   }
 
   def misclassifiedExamples(weights: List[(List[Double], Double)],
                             examples: List[Example]): List[Example] = {
-    examples.filter(ex => VotedPerceptron.predict(weights, ex) != ex.label)
+    examples.filter(ex => VotedPerceptron.predict(weights, ex.X) != ex.y)
   }
 
 }

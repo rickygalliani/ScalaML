@@ -1,1 +1,1 @@
-class Example(val featureVector: List[Double], val label: Int)
+class Example(val X: List[Double], val y: Int)
