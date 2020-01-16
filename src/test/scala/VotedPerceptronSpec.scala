@@ -49,7 +49,7 @@ class VotedPerceptronSpec extends FunSuite {
     assert(vp.misclassifiedExamples(examples).isEmpty)
   }
 
-  test("train(): linear separable case 3: 3 dimensions") {
+  test("train() - linear separable case 3: 3 dimensions") {
     val vp = new VotedPerceptron()
     val examples = List(
       new Example(List(1.0, 1.0, 1.0), 1),
@@ -60,7 +60,7 @@ class VotedPerceptronSpec extends FunSuite {
     assert(vp.misclassifiedExamples(examples).isEmpty)
   }
 
-  test("train(): linear separable case 4: only 1 class") {
+  test("train() - linear separable case 4: only 1 class") {
     val vp = new VotedPerceptron()
     val examples = List(
       new Example(List(1.0, 1.0, 1.0), 1),
@@ -71,7 +71,7 @@ class VotedPerceptronSpec extends FunSuite {
     assert(vp.misclassifiedExamples(examples).isEmpty)
   }
 
-  test("train(): linear inseparable case 1: 2 same points, 2 classes") {
+  test("train() - linear inseparable case 1: 2 same points, 2 classes") {
     val vp = new VotedPerceptron()
     val examples = List(
       new Example(List(1.0, 1.0, 1.0), 1),
@@ -82,7 +82,7 @@ class VotedPerceptronSpec extends FunSuite {
     assert(vp.misclassifiedExamples(examples).length == 1)
   }
 
-  test("train(): linear inseparable case 1: 1 outlier") {
+  test("train() - linear inseparable case 1: 1 outlier") {
     val vp = new VotedPerceptron()
     val examples = List(
       new Example(List(1.0, 1.0, 1.0), 1),
@@ -96,6 +96,25 @@ class VotedPerceptronSpec extends FunSuite {
     vp.train(examples)
     assert(vp.linearlySeparates(examples) == false)
     assert(vp.misclassifiedExamples(examples).length == 1)
+  }
+
+  test("train() - linearly inseparable case 2: several outliers") {
+    val vp = new VotedPerceptron()
+    val testSize = 50
+    val numOutliers = 3
+    val examples = (1 to testSize).toList.flatMap { i => 
+      var posEx = new Example(List(1, 1, 1), 1)
+      var negEx = new Example(List(-1, -1, -1), -1)
+      var exs = List(posEx, negEx)
+      val posOutlier = new Example(List(1, 1, 1), -1)
+      val negOutlier = new Example(List(-1, -1, -1), 1)
+      val outliers = List(posOutlier, negOutlier)
+      if (i % (testSize / numOutliers) == 0) exs = exs ::: outliers  // throw in some outliers
+      exs
+    }
+    vp.train(examples)
+    assert(vp.linearlySeparates(examples) == false)
+    assert(vp.misclassifiedExamples(examples).length == numOutliers * 2)
   }
 
 }

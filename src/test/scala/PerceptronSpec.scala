@@ -24,7 +24,7 @@ class PerceptronSpec extends FunSuite {
     assert(Perceptron.misclassifiedExamples(List(0.0, 0.0, 0.0), examples) == List(badEx))
   }
 
-  test("train() - linear separable case 1: 2 points, 2 classes") {
+  test("train() - linearly separable case 1: 2 points, 2 classes") {
     val p = new Perceptron()
     val examples = List(
       new Example(List(1.0, 1.0), 1),
@@ -35,7 +35,7 @@ class PerceptronSpec extends FunSuite {
     assert(p.misclassifiedExamples(examples).isEmpty)
   }
 
-  test("train() - linear separable case 2: 45 degree line") {
+  test("train() - linearly separable case 2: 45 degree line") {
     val p = new Perceptron()
     // Positive examples above 45 degree line, negative examples below
     val examples = (-10 to 10).toList.flatMap { n =>
@@ -48,7 +48,7 @@ class PerceptronSpec extends FunSuite {
     assert(p.misclassifiedExamples(examples).isEmpty)
   }
 
-  test("train(): linear separable case 3: 3 dimensions") {
+  test("train() - linearly separable case 3: 3 dimensions") {
     val p = new Perceptron()
     val examples = List(
       new Example(List(1.0, 1.0, 1.0), 1),
@@ -59,7 +59,7 @@ class PerceptronSpec extends FunSuite {
     assert(p.misclassifiedExamples(examples).isEmpty)
   }
 
-  test("train(): linear separable case 4: only 1 class") {
+  test("train() - linearly separable case 4: only 1 class") {
     val p = new Perceptron()
     val examples = List(
       new Example(List(1.0, 1.0, 1.0), 1),
@@ -70,7 +70,7 @@ class PerceptronSpec extends FunSuite {
     assert(p.misclassifiedExamples(examples).isEmpty)
   }
 
-  test("train(): linear inseparable case 1: 2 same points, 2 classes") {
+  test("train() - linearly inseparable case 1: 2 same points, 2 classes") {
     val p = new Perceptron()
     val examples = List(
       new Example(List(1.0, 1.0, 1.0), 1),
@@ -81,7 +81,7 @@ class PerceptronSpec extends FunSuite {
     assert(p.misclassifiedExamples(examples).length == 1)
   }
 
-  test("train(): linear inseparable case 1: 1 outlier") {
+  test("train() - linear inseparable case 1: 1 outlier") {
     val p = new Perceptron()
     val examples = List(
       new Example(List(1.0, 1.0, 1.0), 1),
@@ -95,6 +95,25 @@ class PerceptronSpec extends FunSuite {
     p.train(examples)
     assert(p.linearlySeparates(examples) == false)
     assert(p.misclassifiedExamples(examples).length == 1)
+  }
+
+  test("train() - load test 2: linearly inseparable case 2") {
+    val p = new Perceptron()
+    val testSize = 50
+    val numOutliers = 3
+    val examples = (1 to testSize).toList.flatMap { i => 
+      var posEx = new Example(List(1, 1, 1), 1)
+      var negEx = new Example(List(-1, -1, -1), -1)
+      var exs = List(posEx, negEx)
+      val posOutlier = new Example(List(1, 1, 1), -1)
+      val negOutlier = new Example(List(-1, -1, -1), 1)
+      val outliers = List(posOutlier, negOutlier)
+      if (i % (testSize / numOutliers) == 0) exs = exs ::: outliers  // throw in some outliers
+      exs
+    }
+    p.train(examples)
+    assert(p.linearlySeparates(examples) == false)
+    assert(p.misclassifiedExamples(examples).length == numOutliers * 2)
   }
 
 }
