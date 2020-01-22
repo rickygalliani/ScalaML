@@ -1,4 +1,5 @@
 - Load test both Perceptron classes with 10,000 training examples
+- Make TestUtility.generateBinaryExamples() more interesting
 - Add performance metrics (ROC, PR) for binary classification
 - Add linear regression
 - Resolve scalstyle warnings (or add Linter)

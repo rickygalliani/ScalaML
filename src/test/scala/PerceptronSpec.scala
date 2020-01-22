@@ -98,22 +98,14 @@ class PerceptronSpec extends FunSuite {
   }
 
   test("train() - linearly inseparable case 2: several outliers") {
+    val TestSize = 50
+    val NumOutliers = 3
+    
     val p = new Perceptron()
-    val testSize = 50
-    val numOutliers = 3
-    val examples = (1 to testSize).toList.flatMap { i => 
-      var posEx = new Example(List(1, 1, 1), 1)
-      var negEx = new Example(List(-1, -1, -1), -1)
-      var exs = List(posEx, negEx)
-      val posOutlier = new Example(List(1, 1, 1), -1)
-      val negOutlier = new Example(List(-1, -1, -1), 1)
-      val outliers = List(posOutlier, negOutlier)
-      if (i % (testSize / numOutliers) == 0) exs = exs ::: outliers  // throw in some outliers
-      exs
-    }
+    val examples = TestUtility.generateBinaryExamples(TestSize, NumOutliers)
     p.train(examples)
     assert(p.linearlySeparates(examples) == false)
-    assert(p.misclassifiedExamples(examples).length == numOutliers * 2)
+    assert(p.misclassifiedExamples(examples).length == NumOutliers * 2)
   }
   
   test("predict() - case 1: 3 dimensions, positive label") {

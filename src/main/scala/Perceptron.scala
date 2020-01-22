@@ -15,9 +15,9 @@ class Perceptron(var weights: List[Double] = List[Double]()) {
         weights = bestWeightsSoFar
         return weights
       }
-      if (linearlySeparates(examples)) return weights
       val mistakes = misclassifiedExamples(examples)
       val numMistakes = mistakes.length
+      if (numMistakes == 0) return weights
       // Prepare "pocket" data for next training step
       val (newWeights, newMistakes) = {
         if (numMistakes <= fewestMistakesSoFar) (weights, numMistakes)
