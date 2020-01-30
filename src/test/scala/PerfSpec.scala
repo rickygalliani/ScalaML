@@ -3,8 +3,8 @@ import org.scalameter.api._
 object RangeBenchmark extends Bench.LocalTime {
   
   val MinSize = 10
-  val MaxSize = 2000
-  val StepSize = 100
+  val MaxSize = 100
+  val StepSize = 5
   val NumOutliers = MaxSize / MinSize
 
   val testSizes = Gen.range("numExamples")(MinSize, MaxSize, StepSize)
