@@ -1,5 +1,5 @@
 import Utility.generateRandomBinaryExamples
-import BinaryPerformance.{computePrecision, computeRecall}
+import BinaryPerformance.computeMetrics
 
 object Main extends App {
 
@@ -24,31 +24,27 @@ object Main extends App {
   val pTrainPredictions = perceptron.predictBatch(trainX)
   val pTestPredictions = perceptron.predictBatch(testX)
   // Compute Precision, Recall for train and test sets
-  val pTrainPrecision = BinaryPerformance.computePrecision(pTrainPredictions, trainY)
-  val pTrainRecall = BinaryPerformance.computeRecall(pTrainPredictions, trainY)
-  val pTestPrecision = BinaryPerformance.computePrecision(pTestPredictions, testY)
-  val pTestRecall = BinaryPerformance.computeRecall(pTestPredictions, testY)
-  println("== Perceptron ==")
-  println(s"Train Precision: $pTrainPrecision")
-  println(s"Test Precision: $pTestPrecision\n")
-  println(s"Train Recall: $pTrainRecall")
-  println(s"Test Recall: $pTestRecall\n")
+  val pTrainMetrics = BinaryPerformance.computeMetrics(pTrainPredictions, trainY)
+  val pTestMetrics = BinaryPerformance.computeMetrics(pTestPredictions, testY)
+  println("=== Perceptron ===")
+  println("= Train =")
+  println(pTrainMetrics.report)
+  println("= Test =")
+  println(pTestMetrics.report)
 
   // Train VotedPerceptron
-  val votedPerceptron = new VotedPerceptron()
+  val votedPerceptron = new VotedPerceptron(maxEpochs = 100)
   votedPerceptron.train(trainExamples)
   // Predict with VotedPerceptron
   val vpTrainPredictions = votedPerceptron.predictBatch(trainX)
   val vpTestPredictions = perceptron.predictBatch(testX)
   // Compute Precision, Recall for train and test sets
-  val vpTrainPrecision = BinaryPerformance.computePrecision(vpTrainPredictions, trainY)
-  val vpTrainRecall = BinaryPerformance.computeRecall(vpTrainPredictions, trainY)
-  val vpTestPrecision = BinaryPerformance.computePrecision(vpTestPredictions, testY)
-  val vpTestRecall = BinaryPerformance.computeRecall(vpTestPredictions, testY)
-  println("== Voted Perceptron ==")
-  println(s"Train Precision: $vpTrainPrecision")
-  println(s"Test Precision: $vpTestPrecision\n")
-  println(s"Train Recall: $vpTrainRecall")
-  println(s"Test Recall: $vpTestRecall\n")
+  val vpTrainMetrics = BinaryPerformance.computeMetrics(vpTrainPredictions, trainY)
+  val vpTestMetrics = BinaryPerformance.computeMetrics(vpTestPredictions, testY)
+  println("=== Voted Perceptron ===")
+  println("= Train =")
+  println(vpTrainMetrics.report)
+  println("= Test =")
+  println(vpTestMetrics.report)
 
 }
