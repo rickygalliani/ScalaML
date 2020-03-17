@@ -1,4 +1,4 @@
-object Performance {
+object BinaryPerformance {
 
   def computePrecision(predictions: List[Int], labels: List[Int]): Double = {
     val numPredictions = predictions.length

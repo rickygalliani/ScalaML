@@ -3,7 +3,7 @@ import scala.util.Random
 case class WeightVotes(weights: List[List[Double]] = List[List[Double]](),
                        votes: List[Int] = List[Int]()) {
 
-  def computeWeights(): List[(List[Double], Double)] = {
+  def getFinalWeights(): List[(List[Double], Double)] = {
     val weightVotes = weights.zip(votes)
     val totalPastVotes = weightVotes.map { case (ws, v) => v }.sum
     weightVotes.map { case (ws, v) => (ws, (1.0 * v) / totalPastVotes) }
@@ -11,7 +11,8 @@ case class WeightVotes(weights: List[List[Double]] = List[List[Double]](),
 
 }
 
-class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Double], Double)]()) {
+class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Double], Double)](),
+                      val maxEpochs: Int = 25) {
 
   private val random = new Random
 
@@ -20,14 +21,11 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       - http://curtis.ml.cmu.edu/w/courses/index.php/Voted_Perceptron
   */
   def train(examples: List[Example]): List[(List[Double], Double)] = {
-    def trainEpoch(examples: List[Example],
-                   numExamples: Int,
-                   curEpoch: Int,
-                   maxEpochs: Int,
+    def trainEpoch(epoch: Int,
                    curWeights: List[Double],
-                   curWeightVotes: WeightVotes): List[(List[Double], Double)] = {
-      if (curEpoch > maxEpochs) {
-        weights = curWeightVotes.computeWeights()
+                   pocketWeightVotes: WeightVotes): List[(List[Double], Double)] = {
+      if (epoch > maxEpochs) {
+        weights = pocketWeightVotes.getFinalWeights()
         return weights
       }
       val randExampleInds = random.shuffle((0 until numExamples).toList)
@@ -47,20 +45,20 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       val mistakes = Perceptron.misclassifiedExamples(curWeights, examples)
       val randomMistake = mistakes(random.nextInt(mistakes.length))
       val dw = (List(1.0) ::: randomMistake.X).map(_ * randomMistake.y)
-      val newCurWeights = curWeights.zip(dw).map { case (w, d) => w + d }
+      val newWeights = curWeights.zip(dw).map { case (w, d) => w + d }
       // Add current weights to set of past weights
-      val oldWeights = curWeightVotes.weights
-      val oldVotes = curWeightVotes.votes
+      val oldWeights = pocketWeightVotes.weights
+      val oldVotes = pocketWeightVotes.votes
       val newWeightVotes = WeightVotes(curWeights :: oldWeights, curVotes :: oldVotes)
-      trainEpoch(examples, numExamples, curEpoch + 1, maxEpochs, newCurWeights, newWeightVotes)
+      trainEpoch(epoch + 1, newWeights, newWeightVotes)
     }
     val numExamples = examples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
     val modDim = examples(0).X.length + 1
     val curWeights = List.fill(modDim)(0.0)
-    val curWeightVotes = WeightVotes()
+    val pocketWeightVotes = WeightVotes()
     weights = List((curWeights, 1.0))
-    trainEpoch(examples, numExamples, 1, numExamples * 10, curWeights, curWeightVotes)
+    trainEpoch(epoch = 1, curWeights = curWeights, pocketWeightVotes = pocketWeightVotes)
   }
 
   def predict(X: List[Double]): Int = VotedPerceptron.predict(weights, X)
@@ -79,8 +77,8 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
 
 object VotedPerceptron {
 
-  def predict(weights: List[(List[Double], Double)], X: List[Double]): Int = {
-    val score = weights.map { case (w, v) => Perceptron.predict(w, X) * v }.sum
+  def predict(weights: List[(List[Double], Double)], x: List[Double]): Int = {
+    val score = weights.map { case (w, v) => Perceptron.predict(w, x) * v }.sum
     if (score >= 0) 1 else -1
   }
 
