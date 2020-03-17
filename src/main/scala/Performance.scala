@@ -1,4 +1,4 @@
-object PerformanceMetrics {
+object Performance {
 
   def computePrecision(predictions: List[Int], labels: List[Int]): Double = {
     val numPredictions = predictions.length

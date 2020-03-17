@@ -75,18 +75,6 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
     VotedPerceptron.misclassifiedExamples(weights, examples)
   }
 
-  def computePrecision(examples: List[Example]): Double = {
-    val predictions = examples.map(ex => predict(ex.X))
-    val labels = examples.map(_.y)
-    PerformanceMetrics.computePrecision(predictions, labels)
-  }
-
-  def computeRecall(examples: List[Example]): Double = {
-    val predictions = examples.map(ex => predict(ex.X))
-    val labels = examples.map(_.y)
-    PerformanceMetrics.computeRecall(predictions, labels)
-  }
-
 }
 
 object VotedPerceptron {

@@ -48,18 +48,6 @@ class Perceptron(var weights: List[Double] = List[Double]()) {
     Perceptron.misclassifiedExamples(weights, examples)
   }
 
-  def computePrecision(examples: List[Example]): Double = {
-    val predictions = examples.map(ex => predict(ex.X))
-    val labels = examples.map(_.y)
-    PerformanceMetrics.computePrecision(predictions, labels)
-  }
-
-  def computeRecall(examples: List[Example]): Double = {
-    val predictions = examples.map(ex => predict(ex.X))
-    val labels = examples.map(_.y)
-    PerformanceMetrics.computeRecall(predictions, labels)
-  }
-
 }
 
 object Perceptron {
