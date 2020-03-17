@@ -21,6 +21,9 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       - http://curtis.ml.cmu.edu/w/courses/index.php/Voted_Perceptron
   */
   def train(examples: List[Example]): List[(List[Double], Double)] = {
+    val numExamples = examples.length
+    if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
+
     def trainEpoch(epoch: Int,
                    curWeights: List[Double],
                    pocketWeightVotes: WeightVotes): List[(List[Double], Double)] = {
@@ -52,26 +55,18 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       val newWeightVotes = WeightVotes(curWeights :: oldWeights, curVotes :: oldVotes)
       trainEpoch(epoch + 1, newWeights, newWeightVotes)
     }
-    val numExamples = examples.length
-    if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
+
+    // Training for the first time, initialize weights to 0.0 as only "voting" weights
     val modDim = examples(0).X.length + 1
-    val curWeights = List.fill(modDim)(0.0)
+    val initialWeights = List.fill(modDim)(0.0)
     val pocketWeightVotes = WeightVotes()
-    weights = List((curWeights, 1.0))
-    trainEpoch(epoch = 1, curWeights = curWeights, pocketWeightVotes = pocketWeightVotes)
+    weights = List((initialWeights, 1.0))
+    trainEpoch(epoch = 1, curWeights = initialWeights, pocketWeightVotes = pocketWeightVotes)
   }
 
   def predict(X: List[Double]): Int = VotedPerceptron.predict(weights, X)
 
   def predictBatch(Xs: List[List[Double]]): List[Int] = Xs.map(predict)
-
-  def linearlySeparates(examples: List[Example]): Boolean = {
-    VotedPerceptron.linearlySeparates(weights, examples)
-  }
-
-  def misclassifiedExamples(examples: List[Example]): List[Example] = {
-    VotedPerceptron.misclassifiedExamples(weights, examples)
-  }
 
 }
 
@@ -80,16 +75,6 @@ object VotedPerceptron {
   def predict(weights: List[(List[Double], Double)], x: List[Double]): Int = {
     val score = weights.map { case (w, v) => Perceptron.predict(w, x) * v }.sum
     if (score >= 0) 1 else -1
-  }
-
-  def linearlySeparates(weights: List[(List[Double], Double)],
-                        examples: List[Example]): Boolean = {
-    !examples.exists(ex => VotedPerceptron.predict(weights, ex.X) != ex.y)
-  }
-
-  def misclassifiedExamples(weights: List[(List[Double], Double)],
-                            examples: List[Example]): List[Example] = {
-    examples.filter(ex => VotedPerceptron.predict(weights, ex.X) != ex.y)
   }
 
 }

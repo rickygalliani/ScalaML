@@ -1,9 +1,8 @@
 - Load test both Perceptron classes with 10,000 training examples
 - Minimize passes through set of examples in VotedPerceptron and Perceptron 
-- Add predicted positive rate, true negative rate, all the metrics, ...
-- Write tests for PerformanceMetrics functions
+- Add predicted positive rate, true negative rate, all the metrics, and compute them in one pass...
+- Write tests for BinaryPerformance functions
 - Add tests for Perceptron and VotedPerceptron performance metrics functions
-- Look for opportunities to generalize between Perceptron and VotedPerceptron
 - Make TestUtility.generateBinaryExamples() more interesting
 - Add performance metrics (ROC, PR) for binary classification
 - Add linear regression

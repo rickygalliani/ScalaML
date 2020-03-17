@@ -5,6 +5,9 @@ class Perceptron(var weights: List[Double] = List[Double](), val maxEpochs: Int 
   private val random = new Random
 
   def train(examples: List[Example]): List[Double] = {
+    val numExamples = examples.length
+    if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
+
     def trainEpoch(epoch: Int, pocketWeights: List[Double], pocketMistakes: Int): List[Double] = {
       if (epoch > maxEpochs) {
         weights = pocketWeights
@@ -24,8 +27,7 @@ class Perceptron(var weights: List[Double] = List[Double](), val maxEpochs: Int 
       weights = weights.zip(dw).map { case (w, d) => w + d }
       trainEpoch(epoch + 1, newPocketWeights, newPocketMistakes)
     }
-    val numExamples = examples.length
-    if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
+
     // Training for the first time, initialize weights to 0.0, including bias term as w_0
     weights = List.fill(examples(0).X.length + 1)(0.0)
     trainEpoch(epoch = 1, pocketWeights = weights, pocketMistakes = numExamples)
