@@ -27,7 +27,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
     def trainEpoch(epoch: Int,
                    curWeights: List[Double],
                    pocketWeightVotes: WeightVotes): List[(List[Double], Double)] = {
-      if (epoch > maxEpochs) {
+      if (epoch >= maxEpochs) {
         weights = pocketWeightVotes.getFinalWeights()
         return weights
       }
@@ -50,9 +50,12 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
       val dw = (List(1.0) ::: randomMistake.X).map(_ * randomMistake.y)
       val newWeights = curWeights.zip(dw).map { case (w, d) => w + d }
       // Add current weights to set of past weights
-      val oldWeights = pocketWeightVotes.weights
-      val oldVotes = pocketWeightVotes.votes
-      val newWeightVotes = WeightVotes(curWeights :: oldWeights, curVotes :: oldVotes)
+      val newWeightVotes = {
+        if (curVotes == 0) pocketWeightVotes
+        else {
+          WeightVotes(curWeights :: pocketWeightVotes.weights, curVotes :: pocketWeightVotes.votes)
+        }
+      }
       trainEpoch(epoch + 1, newWeights, newWeightVotes)
     }
 

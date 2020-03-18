@@ -96,7 +96,7 @@ F2 Score: $f2Score
         else falsePos += 1
       } else {
         predictedNegatives += 1
-        if (p == 0) trueNeg += 1
+        if (p == -1) trueNeg += 1
         else falseNeg += 1
       }
     }

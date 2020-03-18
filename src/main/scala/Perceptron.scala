@@ -1,6 +1,6 @@
 import scala.util.Random
 
-class Perceptron(var weights: List[Double] = List[Double](), val maxEpochs: Int = 25) {
+class Perceptron(var weights: List[Double] = List[Double](), val maxEpochs: Int = 250) {
 
   private val random = new Random
 
@@ -9,20 +9,20 @@ class Perceptron(var weights: List[Double] = List[Double](), val maxEpochs: Int 
     if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
 
     def trainEpoch(epoch: Int, pocketWeights: List[Double], pocketMistakes: Int): List[Double] = {
-      if (epoch > maxEpochs) {
+      if (epoch >= maxEpochs) {
         weights = pocketWeights
         return weights
       }
       val mistakes = misclassifiedExamples(examples)
       val numMistakes = mistakes.length
       if (numMistakes == 0) return weights
-      // Save best weights in "pocket"
+      // Save best weights and number of mistakes "in pocket"
       val (newPocketWeights, newPocketMistakes) = {
         if (numMistakes <= pocketMistakes) (weights, numMistakes)
         else (pocketWeights, pocketMistakes)
       }
       val randomMistake = mistakes(random.nextInt(numMistakes))
-      val dw = (List(1.0) ::: randomMistake.X).map(_ * randomMistake.y)
+      val dw = (List(1.0) ::: randomMistake.X).map(d => d * randomMistake.y)
       // Update weights: w = w + x * y where (x, y) is a random misclassified example
       weights = weights.zip(dw).map { case (w, d) => w + d }
       trainEpoch(epoch + 1, newPocketWeights, newPocketMistakes)

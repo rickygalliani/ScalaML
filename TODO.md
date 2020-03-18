@@ -1,10 +1,7 @@
-- Load test both Perceptron classes with 10,000 training examples
-- Minimize passes through set of examples in VotedPerceptron and Perceptron 
-- Add predicted positive rate, true negative rate, all the metrics, and compute them in one pass...
+- Add linear regression, logistic regression
+- Load more binary classification datasets from Kaggle
+- Is Recall computation correct? 
+- Minimize passes through set of examples in VotedPerceptron and Perceptron
 - Write tests for BinaryPerformance functions
-- Add tests for Perceptron and VotedPerceptron performance metrics functions
-- Make TestUtility.generateBinaryExamples() more interesting
-- Add performance metrics (ROC, PR) for binary classification
-- Add linear regression
 - Resolve scalstyle warnings (or add Linter)
 - Add scalastyle checks to git commit hooks
