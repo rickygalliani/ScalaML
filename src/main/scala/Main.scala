@@ -35,10 +35,11 @@ Test Examples: ${testExamples.length}
   Negative Examples: ${testY.filter(_ == 1).sum - testY.sum}
 """)
 
-  // Train perceptron.Perceptron
+  // Train Perceptron
   val perceptron = new Perceptron()
   perceptron.train(trainExamples)
-  // Predict with perceptron.Perceptron
+  logger(main, s"Perceptron Weights: ${perceptron.weights.mkString(",")}")
+  // Predict with Perceptron
   val pTrainPredictions = perceptron.predictBatch(trainX)
   val pTestPredictions = perceptron.predictBatch(testX)
   // Compute Precision, Recall for train and test sets
@@ -49,6 +50,7 @@ Test Examples: ${testExamples.length}
   // Train VotedPerceptron
   val votedPerceptron = new VotedPerceptron()
   votedPerceptron.train(trainExamples)
+  logger(main, s"Voted Perceptron Weights: ${votedPerceptron.weights.mkString(",")}")
   // Predict with VotedPerceptron
   val vpTrainPredictions = votedPerceptron.predictBatch(trainX)
   val vpTestPredictions = votedPerceptron.predictBatch(testX)

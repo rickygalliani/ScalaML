@@ -74,9 +74,7 @@ object Perceptron {
     val xDim = X.length
     val modDim = weights.length
     if (xDim != modDim) {
-      throw new IllegalStateException(
-        s"Dimension of feature vector ($xDim) and model ($modDim) don't match."
-      )
+      throw new IllegalStateException(s"Dimension of feature vector ($xDim) and model ($modDim) don't match.")
     }
     val score = weights.zip(X).map { case (w, v) => w * v }.sum
     if (score >= 0) 1 else -1

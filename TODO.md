@@ -1,7 +1,6 @@
+- Debug VotedPerceptron, Perceptron
 - Add linear regression, logistic regression
 - Load more binary classification datasets from Kaggle
 - Is Recall computation correct? 
 - Minimize passes through set of examples in VotedPerceptron and perceptron.Perceptron
 - Write tests for BinaryPerformance functions
-- Resolve scalstyle warnings (or add Linter)
-- Add scalastyle checks to git commit hooks
