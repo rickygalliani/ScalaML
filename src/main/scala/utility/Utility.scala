@@ -1,5 +1,14 @@
+/**
+ * Copyright (C) 2020-2021. Ricky Galliani. All Rights Reserved.
+ * Email: pjgalliani@gmail.com
+ */
+
+package utility
+
+import example.Example
+
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Random 
+import scala.util.Random
 
 object Utility {
 
@@ -8,19 +17,19 @@ object Utility {
 	def generateRandomBinaryExamples(numExamples: Int,
                                    numDimensions: Int,
                                    positiveFraction: Double,
-                                   maxValue: Int = 10000): List[Example] = {
-    (1 to numExamples).toList.map { i =>
+                                   maxValue: Int): List[Example] = {
+    (1 to numExamples).toList.map { _ =>
       val X = (1 to numDimensions).toList.map(_ => random.nextDouble * random.nextInt(maxValue))
       val randDouble = random.nextDouble
       val y = if (randDouble <= positiveFraction) 1 else -1
-      new Example(X, y)
+      Example(X, y)
     }
   }
 
   def loadTitanicExamples(filePath: String,
                           trainFraction: Double = 0.8): (List[Example], List[Example]) = {
 
-    var examplesBuffer = ArrayBuffer[Example]() 
+    var examplesBuffer = ArrayBuffer[Example]()
     var index = 0
     val bufferedSource = io.Source.fromFile(filePath).getLines.drop(1)
     for (line <- bufferedSource) {  // Skip the header line

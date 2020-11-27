@@ -1,3 +1,13 @@
+/**
+ * Copyright (C) 2020-2021. Ricky Galliani. All Rights Reserved.
+ * Email: pjgalliani@gmail.com
+ */
+
+import perceptron.Perceptron
+import votedperceptron.VotedPerceptron
+import performance.BinaryPerformance
+import utility.Utility
+
 object Main extends App {
 
   // Dataset
@@ -19,16 +29,16 @@ Test Examples: ${testExamples.length}
   Negative Examples: ${testY.filter(_ == 1).sum - testY.sum}
 """)
 
-  // Train Perceptron
+  // Train perceptron.Perceptron
   val perceptron = new Perceptron(maxEpochs = 1000)
   perceptron.train(trainExamples)
-  // Predict with Perceptron
+  // Predict with perceptron.Perceptron
   val pTrainPredictions = perceptron.predictBatch(trainX)
   val pTestPredictions = perceptron.predictBatch(testX)
   // Compute Precision, Recall for train and test sets
   val pTrainMetrics = BinaryPerformance.computeMetrics(pTrainPredictions, trainY)
   val pTestMetrics = BinaryPerformance.computeMetrics(pTestPredictions, testY)
-  println("=== Perceptron ===")
+  println("=== perceptron.Perceptron ===")
   println("= Train =")
   println(pTrainMetrics.report)
   println("= Test =")
@@ -43,7 +53,7 @@ Test Examples: ${testExamples.length}
   // Compute Precision, Recall for train and test sets
   val vpTrainMetrics = BinaryPerformance.computeMetrics(vpTrainPredictions, trainY)
   val vpTestMetrics = BinaryPerformance.computeMetrics(vpTestPredictions, testY)
-  println("=== Voted Perceptron ===")
+  println("=== Voted perceptron.Perceptron ===")
   println("= Train =")
   println(vpTrainMetrics.report)
   println("= Test =")

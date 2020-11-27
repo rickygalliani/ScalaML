@@ -1,6 +1,13 @@
-import org.scalatest.FunSuite
+/**
+ * Copyright (C) 2020-2021. Ricky Galliani. All Rights Reserved.
+ * Email: pjgalliani@gmail.com
+ */
+
+package votedperceptron
+
+import org.scalatest.funsuite.AnyFunSuite
   
-class VotedPerceptronSpec extends FunSuite {
+class VotedPerceptronSpec extends AnyFunSuite {
 
   test("predict() - case 1: 3 dimensions, positive label") {
     val vp = new VotedPerceptron()
