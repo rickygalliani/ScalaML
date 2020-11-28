@@ -13,23 +13,20 @@ import scala.util.Random
 class Perceptron(var weights: List[Double] = List[Double](), val maxEpochs: Int = MaxEpochs) {
 
   private val random = new Random
+  random.setSeed(TrainSeed)
 
-  def train(examples: List[Example]): List[Double] = {
+  def train(examples: List[Example]): Unit = {
+    random.shuffle(examples)
     val numExamples = examples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples.")
 
+    // Updates weights attribute in place
     @tailrec
-    def trainEpoch(epoch: Int, pocketWeights: List[Double], pocketMistakes: Int): List[Double] = {
-      if (epoch >= maxEpochs) {
-        pocketWeights
-      }
-      else {
+    def trainEpoch(epoch: Int, pocketWeights: List[Double], pocketMistakes: Int): Unit = {
+      if (epoch < maxEpochs) {
         val mistakes = misclassifiedExamples(examples)
         val numMistakes = mistakes.length
-        if (numMistakes == 0) {
-          weights
-        }
-        else {
+        if (numMistakes > 0) {
           // Save best weights and number of mistakes "in pocket"
           val (newPocketWeights, newPocketMistakes) = {
             if (numMistakes <= pocketMistakes) {

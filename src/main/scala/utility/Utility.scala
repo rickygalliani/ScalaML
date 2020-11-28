@@ -13,6 +13,7 @@ import scala.util.Random
 object Utility {
 
   private val random = new Random
+  random.setSeed(22L)
 
 	def generateRandomBinaryExamples(numExamples: Int,
                                    numDimensions: Int,
@@ -62,8 +63,7 @@ object Utility {
         examplesBuffer += Example(X, y = survived)
         index += 1
     }
-    Random.setSeed(22L)
-    val examples = Random.shuffle(examplesBuffer.toList)
+    val examples = random.shuffle(examplesBuffer.toList)
     val numExamples = examples.length
     val numTrainExamples = (numExamples * trainFraction).toInt
     val trainExamples = examples.slice(0, numTrainExamples)

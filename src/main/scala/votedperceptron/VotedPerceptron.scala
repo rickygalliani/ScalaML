@@ -15,24 +15,23 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
                       val maxEpochs: Int = MaxEpochs) {
 
   private val random = new Random
+  random.setSeed(TrainSeed)
 
   /**
    * Implements the Voted perceptron.Perceptron learning algorithm:
    * - http://curtis.ml.cmu.edu/w/courses/index.php/Voted_Perceptron
    */
-  def train(examples: List[Example]): List[(List[Double], Double)] = {
+  def train(examples: List[Example]): Unit = {
+    random.shuffle(examples)
     val numExamples = examples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
 
     @tailrec
-    def trainEpoch(epoch: Int,
-                   curWeights: List[Double],
-                   pocketWeightVotes: WeightVotes): List[(List[Double], Double)] = {
-      if (epoch >= maxEpochs) {
-        pocketWeightVotes.getFinalWeights
-      }
+    def trainEpoch(epoch: Int, pocketWeightVotes: WeightVotes): Unit = {
+      if (epoch >= maxEpochs) { weights = pocketWeightVotes.getFinalWeights }
       else {
         val randExampleInds = random.shuffle((0 until numExamples).toList)
+        val curWeights = pocketWeightVotes.weights.head
         var curVotes = 0 // Number of examples this set of weights classifies correctly
         var stillPerfect = true
         while (stillPerfect && curVotes < numExamples) {
@@ -41,9 +40,8 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
           stillPerfect = prediction == example.y
           curVotes = if (stillPerfect) curVotes + 1 else curVotes
         }
-        if (stillPerfect) { // current weights linearly separate the dataset
-          List((curWeights, 1.0))
-        }
+        // current weights linearly separate the dataset
+        if (stillPerfect) { WeightVotes(List(curWeights), List[Int](1)).getFinalWeights }
         else {
           // Update current weights: w = w + x * y where (x, y) is a random misclassified example
           val mistakes = Perceptron.misclassifiedExamples(curWeights, examples)
@@ -56,20 +54,20 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
               pocketWeightVotes
             }
             else {
-              WeightVotes(curWeights :: pocketWeightVotes.weights, curVotes :: pocketWeightVotes.votes)
+              val newPocketWeights = newWeights :: curWeights :: pocketWeightVotes.weights.tail
+              val newPocketVotes = 0 :: curVotes :: pocketWeightVotes.votes.tail
+              WeightVotes(newPocketWeights, newPocketVotes)
             }
           }
-          trainEpoch(epoch + 1, newWeights, newWeightVotes)
+          trainEpoch(epoch + 1, newWeightVotes)
         }
       }
     }
 
     // Training for the first time, initialize weights to 0.0 as only "voting" weights
     val modDim = examples.head.X.length + 1
-    val initialWeights = List.fill(modDim)(0.0)
-    val pocketWeightVotes = WeightVotes()
-    weights = List((initialWeights, 1.0))
-    trainEpoch(epoch = 1, curWeights = initialWeights, pocketWeightVotes = pocketWeightVotes)
+    val pocketWeightVotes = WeightVotes(List(List.fill(modDim)(0.0)), List(1))
+    trainEpoch(epoch = 1, pocketWeightVotes = pocketWeightVotes)
   }
 
   def predict(X: List[Double]): Int = VotedPerceptron.predict(weights, X)

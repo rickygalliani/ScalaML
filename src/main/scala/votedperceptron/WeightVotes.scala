@@ -9,8 +9,12 @@ case class WeightVotes(weights: List[List[Double]] = List[List[Double]](), votes
 
   def getFinalWeights: List[(List[Double], Double)] = {
     val weightVotes = weights.zip(votes)
-    val totalPastVotes = weightVotes.map { case (_, v) => v }.sum
-    weightVotes.map { case (ws, v) => (ws, (1.0 * v) / totalPastVotes) }
+    val totalVotes = weightVotes.map { case (_, v) => v }.sum
+    weightVotes.map { case (ws, v) => (ws, (1.0 * v) / totalVotes) }
+  }
+
+  def asString: String = {
+    s"\n\t - ${weights.zip(votes).map { case (ws, v) => s"$v: ${ws.mkString(",")}" }.mkString("\n\t - ")}"
   }
 
 }

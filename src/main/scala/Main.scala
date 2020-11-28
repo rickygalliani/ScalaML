@@ -38,7 +38,6 @@ Test Examples: ${testExamples.length}
   // Train Perceptron
   val perceptron = new Perceptron()
   perceptron.train(trainExamples)
-  logger(main, s"Perceptron Weights: ${perceptron.weights.mkString(",")}")
   // Predict with Perceptron
   val pTrainPredictions = perceptron.predictBatch(trainX)
   val pTestPredictions = perceptron.predictBatch(testX)
@@ -50,7 +49,6 @@ Test Examples: ${testExamples.length}
   // Train VotedPerceptron
   val votedPerceptron = new VotedPerceptron()
   votedPerceptron.train(trainExamples)
-  logger(main, s"Voted Perceptron Weights: ${votedPerceptron.weights.mkString(",")}")
   // Predict with VotedPerceptron
   val vpTrainPredictions = votedPerceptron.predictBatch(trainX)
   val vpTestPredictions = votedPerceptron.predictBatch(testX)

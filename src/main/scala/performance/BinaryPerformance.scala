@@ -59,7 +59,13 @@ object BinaryPerformance {
 
   }
 
-  case class Metrics(
+  case class BinaryClassificationMetrics(
+    predictedPositives: Int,
+    predictedNegatives: Int,
+    truePositives: Int,
+    trueNegatives: Int,
+    falsePositives: Int,
+    falseNegatives: Int,
     precision: Double,
     recall: Double,
     specificity: Double,
@@ -73,7 +79,14 @@ object BinaryPerformance {
   ) {
     
     def report: String = {
-      s"""Precision: $precision
+s"""
+Predicted Positives: $predictedPositives
+Predicted Negatives: $predictedNegatives
+True Positives: $truePositives
+False Positives: $falsePositives
+True Negatives: $trueNegatives
+False Negatives: $falseNegatives
+Precision: $precision
 Recall: $recall
 Specificity: $specificity
 False Positive Rate (Type I Error): $falsePositiveRate
@@ -88,7 +101,7 @@ F2 Score: $f2Score
 
   }
 
-  def computeMetrics(predictions: List[Int], labels: List[Int]): Metrics = {
+  def computeMetrics(predictions: List[Int], labels: List[Int]): BinaryClassificationMetrics = {
     var predictedPositives = 0
     var predictedNegatives = 0
     var truePos = 0
@@ -99,26 +112,25 @@ F2 Score: $f2Score
     predictions.zip(labels).foreach { case (p, l) =>
       if (p == 1) {
         predictedPositives += 1
-        if (p == l) {
-          truePos += 1
-        }
-        else {
-          falsePos += 1
-        }
-      } else {
+        if (l == 1) { truePos += 1 }
+        else { falsePos += 1 }
+      }
+      else {  // p == -1
         predictedNegatives += 1
-        if (p == -1) {
-          trueNeg += 1
-        }
-        else {
-          falseNeg += 1
-        }
+        if (l == -1) { trueNeg += 1 }
+        else { falseNeg += 1 }
       }
     }
 
     // Confusion Matrix
     val cm = ConfusionMatrix(truePos, falsePos, trueNeg, falseNeg)
-    Metrics(
+    BinaryClassificationMetrics(
+      predictedPositives,
+      predictedNegatives,
+      truePos,
+      falsePos,
+      trueNeg,
+      falseNeg,
       cm.getPrecision,
       cm.getRecall,
       cm.getSpecificity,

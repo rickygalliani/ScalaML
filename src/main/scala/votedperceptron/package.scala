@@ -4,5 +4,6 @@
  */
 
 package object votedperceptron {
+  val TrainSeed: Int = 42
   val MaxEpochs: Int = 1000
 }

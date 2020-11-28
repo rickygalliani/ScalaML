@@ -4,5 +4,6 @@
  */
 
 package object perceptron {
+  val TrainSeed: Int = 21
   val MaxEpochs: Int = 1000
 }
