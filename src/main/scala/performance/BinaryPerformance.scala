@@ -115,9 +115,9 @@ F2 Score: $f2Score
         if (l == 1) { truePos += 1 }
         else { falsePos += 1 }
       }
-      else {  // p == -1
+      else {  // p == 0
         predictedNegatives += 1
-        if (l == -1) { trueNeg += 1 }
+        if (l == 0) { trueNeg += 1 }
         else { falseNeg += 1 }
       }
     }

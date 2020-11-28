@@ -5,4 +5,4 @@
 
 package example
 
-case class Example(X: List[Double], y: Int)
+class Example(val X: List[Double], val y: Int)

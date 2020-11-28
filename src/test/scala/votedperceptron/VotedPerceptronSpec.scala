@@ -28,7 +28,7 @@ class VotedPerceptronSpec extends AnyFunSuite {
     vp.weights = List((List(1.0, 2.0, 3.0), 0.5), (List(2.0, 4.0, 6.0), 0.5))
     val prediction = vp.predict(List(1, 1))
     assert(prediction == 1)
-  } 
+  }
 
   test("predictBatch() - case 1: 2 dimensions 1 vector") {
     val vp = new VotedPerceptron()

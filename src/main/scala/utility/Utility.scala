@@ -5,7 +5,8 @@
 
 package utility
 
-import example.Example
+import example.PerceptronBinaryClassificationExample
+import example.{BinaryClassificationExample}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -18,19 +19,19 @@ object Utility {
 	def generateRandomBinaryExamples(numExamples: Int,
                                    numDimensions: Int,
                                    positiveFraction: Double,
-                                   maxValue: Int): List[Example] = {
+                                   maxValue: Int): List[BinaryClassificationExample] = {
     (1 to numExamples).toList.map { _ =>
       val X = (1 to numDimensions).toList.map(_ => random.nextDouble * random.nextInt(maxValue))
       val randDouble = random.nextDouble
       val y = if (randDouble <= positiveFraction) 1 else -1
-      Example(X, y)
+      new BinaryClassificationExample(X, y)
     }
   }
 
-  def loadTitanicExamples(filePath: String,
-                          trainFraction: Double = 0.8): (List[Example], List[Example]) = {
+  def loadTitanicExamples(filePath: String, trainFraction: Double = 0.8):
+  (List[BinaryClassificationExample], List[BinaryClassificationExample]) = {
 
-    var examplesBuffer = ArrayBuffer[Example]()
+    var examplesBuffer = ArrayBuffer[BinaryClassificationExample]()
     var index = 0
     val bufferedSource = io.Source.fromFile(filePath).getLines.drop(1)
     for (line <- bufferedSource) {  // Skip the header line
@@ -60,7 +61,7 @@ object Utility {
           queenstownEmbark,
           southamptonEmbark
         )
-        examplesBuffer += Example(X, y = survived)
+        examplesBuffer += new BinaryClassificationExample(X, y = survived)
         index += 1
     }
     val examples = random.shuffle(examplesBuffer.toList)

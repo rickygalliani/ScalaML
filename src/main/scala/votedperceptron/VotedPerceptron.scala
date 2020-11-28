@@ -5,7 +5,8 @@
 
 package votedperceptron
 
-import example.Example
+import example.BinaryClassificationExample
+import example.PerceptronBinaryClassificationExample
 import perceptron.Perceptron
 
 import scala.annotation.tailrec
@@ -21,9 +22,10 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
    * Implements the Voted perceptron.Perceptron learning algorithm:
    * - http://curtis.ml.cmu.edu/w/courses/index.php/Voted_Perceptron
    */
-  def train(examples: List[Example]): Unit = {
-    random.shuffle(examples)
-    val numExamples = examples.length
+  def train(examples: List[BinaryClassificationExample]): Unit = {
+    val perceptronExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    random.shuffle(perceptronExamples)
+    val numExamples = perceptronExamples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
 
     @tailrec
@@ -35,7 +37,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
         var curVotes = 0 // Number of examples this set of weights classifies correctly
         var stillPerfect = true
         while (stillPerfect && curVotes < numExamples) {
-          val example = examples(randExampleInds(curVotes))
+          val example = perceptronExamples(randExampleInds(curVotes))
           val prediction = Perceptron.predict(curWeights, example.X)
           stillPerfect = prediction == example.y
           curVotes = if (stillPerfect) curVotes + 1 else curVotes
@@ -44,7 +46,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
         if (stillPerfect) { WeightVotes(List(curWeights), List[Int](1)).getFinalWeights }
         else {
           // Update current weights: w = w + x * y where (x, y) is a random misclassified example
-          val mistakes = Perceptron.misclassifiedExamples(curWeights, examples)
+          val mistakes = Perceptron.misclassifiedExamples(curWeights, perceptronExamples)
           val randomMistake = mistakes(random.nextInt(mistakes.length))
           val dw = (List(1.0) ::: randomMistake.X).map(_ * randomMistake.y)
           val newWeights = curWeights.zip(dw).map { case (w, d) => w + d }
@@ -65,7 +67,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
     }
 
     // Training for the first time, initialize weights to 0.0 as only "voting" weights
-    val modDim = examples.head.X.length + 1
+    val modDim = perceptronExamples.head.X.length + 1
     val pocketWeightVotes = WeightVotes(List(List.fill(modDim)(0.0)), List(1))
     trainEpoch(epoch = 1, pocketWeightVotes = pocketWeightVotes)
   }
