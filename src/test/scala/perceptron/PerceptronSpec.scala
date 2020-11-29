@@ -5,11 +5,11 @@
 
 package perceptron
 
-import utility.TestUtility.generateBinaryClassificationExamples
+import data.TestData.generateBinaryClassificationExamples
 import example.BinaryClassificationExample
 import example.PerceptronBinaryClassificationExample
 import org.scalatest.funsuite.AnyFunSuite
-  
+
 class PerceptronSpec extends AnyFunSuite {
 
   test("linearlySeparates() - positive case 1: 0 weights") {
@@ -118,7 +118,7 @@ class PerceptronSpec extends AnyFunSuite {
   test("train() - linearly inseparable case 2: several outliers") {
     val TestSize = 50
     val NumOutliers = 3
-    
+
     val p = new Perceptron()
     val examples = generateBinaryClassificationExamples(TestSize, NumOutliers)
     p.train(examples)
@@ -126,7 +126,7 @@ class PerceptronSpec extends AnyFunSuite {
     assert(!p.linearlySeparates(pExamples))
     assert(p.misclassifiedExamples(pExamples).length == NumOutliers * 2)
   }
-  
+
   test("predict() - case 1: 3 dimensions, positive label") {
     val p = new Perceptron()
     p.weights = List(1.0, 2.0, 3.0)

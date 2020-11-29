@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.scala.Logging
 import perceptron.Perceptron
 import performance.BinaryPerformance
-import utility.Utility
+import data.Data
 import votedperceptron.VotedPerceptron
 
 object Main extends App with Logging {
@@ -17,7 +17,7 @@ object Main extends App with Logging {
 
   // Dataset
   val titanicFilePath = "/Users/pjgalliani/Code/scalaml/Titanic.csv"
-  val (trainExamples, testExamples) = Utility.loadTitanicExamples(filePath = titanicFilePath)
+  val (trainExamples, testExamples) = Data.loadTitanicExamples(filePath = titanicFilePath)
   val trainX = trainExamples.map(ex => ex.X)
   val testX = testExamples.map(ex => ex.X)
   val trainY = trainExamples.map(ex => ex.y)
@@ -26,7 +26,7 @@ object Main extends App with Logging {
   logger(main,
 s"""
 === Dataset ===
-Dimension: ${trainExamples.head.X.length}
+Features: ${trainExamples.head.X.length}
 Train Examples: ${trainExamples.length}
   Positive Examples: ${trainY.filter(_ == 1).sum}
   Negative Examples: ${trainY.filter(_ == 1).sum - trainY.sum}

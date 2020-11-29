@@ -3,11 +3,11 @@
  * Email: pjgalliani@gmail.com
  */
 
-package utility
+package data
 
 import example.BinaryClassificationExample
 
-object TestUtility {
+object TestData {
 
   def generateBinaryClassificationExamples(numExamples: Int, numOutliers: Int): List[BinaryClassificationExample] = {
     (1 to numExamples).toList.flatMap { i =>

@@ -1,4 +1,3 @@
-- Debug VotedPerceptron, Perceptron
 - Add feature normalization
 - Add printMetadata() function for each model
 - Add linear regression, logistic regression

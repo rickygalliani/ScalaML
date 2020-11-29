@@ -7,7 +7,7 @@ package perceptron
 
 import example.{BinaryClassificationExample, Example}
 import org.scalameter.api._
-import utility.TestUtility
+import data.TestData
 
 object PerceptronPerfSpec extends Bench.LocalTime {
   
@@ -19,9 +19,9 @@ object PerceptronPerfSpec extends Bench.LocalTime {
   val TestSizes: Gen[Int] = Gen.range("numExamples")(MinSize, MaxSize, StepSize)
 
   val LinearlySeparableExamples: List[BinaryClassificationExample] =
-    TestUtility.generateBinaryClassificationExamples(MaxSize, 0)
+    TestData.generateBinaryClassificationExamples(MaxSize, 0)
   val LinearlyInseparableExamples: List[BinaryClassificationExample] =
-    TestUtility.generateBinaryClassificationExamples(MaxSize, NumOutliers)
+    TestData.generateBinaryClassificationExamples(MaxSize, NumOutliers)
 
   performance of "Linearly Inseparable Case: perceptron.Perceptron" in {
     measure method "train" in {

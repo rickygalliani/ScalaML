@@ -3,15 +3,15 @@
  * Email: pjgalliani@gmail.com
  */
 
-package utility
+package data
 
 import example.PerceptronBinaryClassificationExample
-import example.{BinaryClassificationExample}
+import example.BinaryClassificationExample
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-object Utility {
+object Data {
 
   private val random = new Random
   random.setSeed(22L)
