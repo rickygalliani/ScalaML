@@ -7,30 +7,30 @@ package perceptron
 
 import data.TestData.generateBinaryClassificationExamples
 import example.BinaryClassificationExample
-import example.PerceptronBinaryClassificationExample
+import example.PosNegBinaryClassificationExample
 import org.scalatest.funsuite.AnyFunSuite
 
 class PerceptronSpec extends AnyFunSuite {
 
   test("linearlySeparates() - positive case 1: 0 weights") {
     val examples = List(
-      PerceptronBinaryClassificationExample(List(1.0, 1.0), 1),
-      PerceptronBinaryClassificationExample(List(1.0, -1.0), -1)
+      PosNegBinaryClassificationExample(List(1.0, 1.0), 1),
+      PosNegBinaryClassificationExample(List(1.0, -1.0), -1)
     )
     assert(!Perceptron.linearlySeparates(List(0.0, 0.0, 0.0), examples))
   }
 
   test("linearlySeparates() - negative case 1: 2 points, 2 classes") {
     val examples = List(
-      PerceptronBinaryClassificationExample(List(1.0, 1.0), 1),
-      PerceptronBinaryClassificationExample(List(1.0, -1.0), -1)
+      PosNegBinaryClassificationExample(List(1.0, 1.0), 1),
+      PosNegBinaryClassificationExample(List(1.0, -1.0), -1)
     )
     assert(Perceptron.linearlySeparates(List(0.0, 0.0, 2.0), examples))
   }
 
   test("misclassifiedExamples() - case 1: 2 points, 1 misclassified") {
-    val badEx = PerceptronBinaryClassificationExample(List(1.0, -1.0), -1)
-    val examples = List(PerceptronBinaryClassificationExample(List(1.0, 1.0), 1), badEx)
+    val badEx = PosNegBinaryClassificationExample(List(1.0, -1.0), -1)
+    val examples = List(PosNegBinaryClassificationExample(List(1.0, 1.0), 1), badEx)
     assert(Perceptron.misclassifiedExamples(List(0.0, 0.0, 0.0), examples) == List(badEx))
   }
 
@@ -41,7 +41,7 @@ class PerceptronSpec extends AnyFunSuite {
       new BinaryClassificationExample(List(1.0, -1.0), 0)
     )
     p.train(examples)
-    val pExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    val pExamples = examples.map(e => PosNegBinaryClassificationExample(e))
     assert(p.linearlySeparates(pExamples))
     assert(p.misclassifiedExamples(pExamples).isEmpty)
   }
@@ -57,7 +57,7 @@ class PerceptronSpec extends AnyFunSuite {
       List(exPos, exNeg)
     }
     p.train(examples)
-    val pExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    val pExamples = examples.map(e => PosNegBinaryClassificationExample(e))
     assert(p.linearlySeparates(pExamples))
     assert(p.misclassifiedExamples(pExamples).isEmpty)
   }
@@ -69,7 +69,7 @@ class PerceptronSpec extends AnyFunSuite {
       new BinaryClassificationExample(List(-1.0, -1.0, -1.0), 0)
     )
     p.train(examples)
-    val pExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    val pExamples = examples.map(e => PosNegBinaryClassificationExample(e))
     assert(p.linearlySeparates(pExamples))
     assert(p.misclassifiedExamples(pExamples).isEmpty)
   }
@@ -81,7 +81,7 @@ class PerceptronSpec extends AnyFunSuite {
       new BinaryClassificationExample(List(-1.0, -1.0, -1.0), 1)
     )
     p.train(examples)
-    val pExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    val pExamples = examples.map(e => PosNegBinaryClassificationExample(e))
     assert(p.linearlySeparates(pExamples))
     assert(p.misclassifiedExamples(pExamples).isEmpty)
   }
@@ -93,7 +93,7 @@ class PerceptronSpec extends AnyFunSuite {
       new BinaryClassificationExample(List(1.0, 1.0, 1.0), 0)
     )
     p.train(examples)
-    val pExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    val pExamples = examples.map(e => PosNegBinaryClassificationExample(e))
     assert(!p.linearlySeparates(pExamples))
     assert(p.misclassifiedExamples(pExamples).length == 1)
   }
@@ -110,7 +110,7 @@ class PerceptronSpec extends AnyFunSuite {
       new BinaryClassificationExample(List(-1.0, -1.0, -1.0), 1)  // outlier
     )
     p.train(examples)
-    val pExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    val pExamples = examples.map(e => PosNegBinaryClassificationExample(e))
     assert(!p.linearlySeparates(pExamples))
     assert(p.misclassifiedExamples(pExamples).length == 1)
   }
@@ -122,7 +122,7 @@ class PerceptronSpec extends AnyFunSuite {
     val p = new Perceptron()
     val examples = generateBinaryClassificationExamples(TestSize, NumOutliers)
     p.train(examples)
-    val pExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    val pExamples = examples.map(e => PosNegBinaryClassificationExample(e))
     assert(!p.linearlySeparates(pExamples))
     assert(p.misclassifiedExamples(pExamples).length == NumOutliers * 2)
   }
@@ -138,14 +138,14 @@ class PerceptronSpec extends AnyFunSuite {
     val p = new Perceptron()
     p.weights = List(-1.0, -2.0, -3.0)
     val prediction = p.predict(List(1, 1))
-    assert(prediction == -1)
+    assert(prediction == 0)
   }
 
   test("predictBatch() - case 1: positive label, negative label") {
     val p = new Perceptron()
     p.weights = List(1.0, 2.0, 3.0)
     val prediction = p.predictBatch(List(List(1, 1), List(-1, -1)))
-    assert(prediction == List(1, -1))
+    assert(prediction == List(1, 0))
   }
 
 }

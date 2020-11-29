@@ -5,6 +5,6 @@
 
 package data.normalize
 
-abstract class Normalizer {
-  def normalize(xs: List[Double]): List[Double]
+abstract class Normalizer(val xs: List[Double]) {
+  def normalize(newXs: List[Double]): List[Double]
 }

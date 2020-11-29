@@ -20,7 +20,7 @@ class VotedPerceptronSpec extends AnyFunSuite {
     val vp = new VotedPerceptron()
     vp.weights = List((List(-1.0, -2.0, -3.0), 1.0))
     val prediction = vp.predict(List(1, 1))
-    assert(prediction == -1)
+    assert(prediction == 0)
   }
 
   test("predict() - case 3: 3 dimensions, 2 vectors") {
@@ -34,14 +34,14 @@ class VotedPerceptronSpec extends AnyFunSuite {
     val vp = new VotedPerceptron()
     vp.weights = List((List(1.0, 2.0, 3.0), 1.0))
     val predictions = vp.predictBatch(List(List(1, 1), List(-1, -1)))
-    assert(predictions == List(1, -1))
+    assert(predictions == List(1, 0))
   }
 
   test("predictBatch() - case 2: 3 dimensions 2 vectors") {
     val vp = new VotedPerceptron()
     vp.weights = List((List(1.0, 2.0, 3.0), 0.5), (List(2.0, 4.0, 6.0), 0.5))
     val predictions = vp.predictBatch(List(List(1, 1), List(-1, -1)))
-    assert(predictions == List(1, -1))
+    assert(predictions == List(1, 0))
   }
 
 }

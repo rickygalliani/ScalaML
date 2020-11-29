@@ -5,11 +5,12 @@
 
 package data.normalize
 
-class MeanNormalizer() extends Normalizer {
-  def normalize(xs: List[Double]): List[Double] = {
-    val meanX = 1.0 * xs.sum / xs.size
-    val minX = xs.min
-    val maxX = xs.max
-    xs.map(x => (x - meanX) / (maxX - minX))
-  }
+class MeanNormalizer(override val xs: List[Double]) extends Normalizer(xs) {
+
+  val minX: Double = xs.min
+  val maxX: Double = xs.max
+  val meanX: Double = 1.0 * xs.sum / xs.size
+
+  def normalize(newXs: List[Double]): List[Double] = xs.map(x => (x - meanX) / (maxX - minX))
+
 }

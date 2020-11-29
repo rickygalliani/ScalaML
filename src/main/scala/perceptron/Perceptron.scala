@@ -5,7 +5,7 @@
 
 package perceptron
 
-import example.{BinaryClassificationExample, Example, PerceptronBinaryClassificationExample}
+import example.{BinaryClassificationExample, Example, PosNegBinaryClassificationExample, binaryToPosNeg}
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -16,7 +16,7 @@ class Perceptron(var weights: List[Double] = List[Double](), val maxEpochs: Int 
   random.setSeed(TrainSeed)
 
   def train(examples: List[BinaryClassificationExample]): Unit = {
-    val perceptronExamples = examples.map(e => PerceptronBinaryClassificationExample(e))
+    val perceptronExamples = examples.map(e => PosNegBinaryClassificationExample(e))
     random.shuffle(examples)
     val numExamples = perceptronExamples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples.")
@@ -55,11 +55,11 @@ class Perceptron(var weights: List[Double] = List[Double](), val maxEpochs: Int 
 
   def predictBatch(Xs: List[List[Double]]): List[Int] = Xs.map(predict)
 
-  def linearlySeparates(examples: List[PerceptronBinaryClassificationExample]): Boolean = {
+  def linearlySeparates(examples: List[PosNegBinaryClassificationExample]): Boolean = {
     Perceptron.linearlySeparates(weights, examples)
   }
 
-  def misclassifiedExamples(examples: List[PerceptronBinaryClassificationExample]): List[Example] = {
+  def misclassifiedExamples(examples: List[PosNegBinaryClassificationExample]): List[Example] = {
     Perceptron.misclassifiedExamples(weights, examples)
   }
 
@@ -75,17 +75,17 @@ object Perceptron {
       throw new IllegalStateException(s"Dimension of feature vector ($xDim) and model ($modDim) don't match.")
     }
     val score = weights.zip(X).map { case (w, v) => w * v }.sum
-    if (score >= 0) 1 else -1
+    if (score >= 0) 1 else 0
   }
 
   def linearlySeparates(weights: List[Double],
-                        examples: List[PerceptronBinaryClassificationExample]): Boolean = {
-    !examples.exists(ex => Perceptron.predict(weights, ex.X) != ex.y)
+                        examples: List[PosNegBinaryClassificationExample]): Boolean = {
+    !examples.exists(ex => binaryToPosNeg(Perceptron.predict(weights, ex.X)) != ex.y)
   }
 
-  def misclassifiedExamples(weights: List[Double], examples: List[PerceptronBinaryClassificationExample]):
-  List[PerceptronBinaryClassificationExample] = {
-    examples.filter(ex => Perceptron.predict(weights, ex.X) != ex.y)
+  def misclassifiedExamples(weights: List[Double], examples: List[PosNegBinaryClassificationExample]):
+  List[PosNegBinaryClassificationExample] = {
+    examples.filter(ex => binaryToPosNeg(Perceptron.predict(weights, ex.X)) != ex.y)
   }
 
 }

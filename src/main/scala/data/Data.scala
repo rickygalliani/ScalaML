@@ -5,7 +5,7 @@
 
 package data
 
-import example.PerceptronBinaryClassificationExample
+import example.PosNegBinaryClassificationExample
 import example.BinaryClassificationExample
 
 import scala.collection.mutable.ArrayBuffer
