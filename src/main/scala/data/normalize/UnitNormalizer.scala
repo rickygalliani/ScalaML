@@ -5,12 +5,15 @@
 
 package data.normalize
 
-class UnitNormalizer(override val xs: List[Double],
-                     val minValue: Double = 0.0,
-                     val maxValue: Double = 1.0) extends Normalizer(xs) {
+class UnitNormalizer(val minValue: Double = 0.0, val maxValue: Double = 1.0) extends Normalizer {
 
-  val euclideanNorm: Double = math.sqrt(xs.map(x => math.pow(x, 2)).sum)
+  // Store first computed euclidean norm as baseline parameters to normalize future vectors
+  var euclideanNorm: Option[Double] = None
 
-  def normalize(xs: List[Double]): List[Double] = xs.map(_ / euclideanNorm)
+  def normalize(xs: List[Double]): List[Double] = {
+    val curEuclideanNorm = math.sqrt(xs.map(x => math.pow(x, 2)).sum)
+    euclideanNorm = Some(euclideanNorm.getOrElse(curEuclideanNorm))
+    xs.map(_ / euclideanNorm.get)
+  }
 
 }

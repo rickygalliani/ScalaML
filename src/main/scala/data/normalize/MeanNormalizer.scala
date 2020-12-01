@@ -5,12 +5,21 @@
 
 package data.normalize
 
-class MeanNormalizer(override val xs: List[Double]) extends Normalizer(xs) {
+class MeanNormalizer extends Normalizer {
 
-  val minX: Double = xs.min
-  val maxX: Double = xs.max
-  val meanX: Double = 1.0 * xs.sum / xs.size
+  // Store first seen min, max, and mean as baseline parameters to normalize future vectors
+  var minX: Option[Double] = None
+  var maxX: Option[Double] = None
+  var meanX: Option[Double] = None
 
-  def normalize(newXs: List[Double]): List[Double] = xs.map(x => (x - meanX) / (maxX - minX))
+  def normalize(xs: List[Double]): List[Double] = {
+    val curMin = xs.min
+    val curMax = xs.max
+    val curMean = 1.0 * xs.sum / xs.size
+    minX = Some(this.minX.getOrElse(curMin))
+    maxX = Some(this.maxX.getOrElse(curMax))
+    meanX = Some(this.meanX.getOrElse(curMean))
+    xs.map(x => (x - meanX.get) / (this.maxX.get - this.minX.get))
+  }
 
 }

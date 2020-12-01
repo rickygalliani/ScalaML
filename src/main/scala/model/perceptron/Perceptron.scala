@@ -5,7 +5,7 @@
 
 package model.perceptron
 
-import example.{Example, UnitBinaryClassificationExample, binaryToPosNeg}
+import example.{Example, UnitBinaryClassificationExample}
 import model.UnitBinaryClassificationModel
 
 import scala.annotation.tailrec
@@ -15,9 +15,9 @@ class Perceptron(var weights: List[Double] = List[Double](),
                  val maxEpochs: Int = MaxEpochs) extends UnitBinaryClassificationModel {
 
   private val random = new Random
-  random.setSeed(TrainSeed)
 
   override def learn(examples: List[UnitBinaryClassificationExample]): Unit = {
+    random.setSeed(TrainSeed)
     random.shuffle(examples)
     val numExamples = examples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples.")
@@ -42,6 +42,7 @@ class Perceptron(var weights: List[Double] = List[Double](),
           val dw = (List(1.0) ::: randomMistake.X).map(d => d * randomMistake.y)
           // Update weights: w = w + x * y where (x, y) is a random misclassified example
           weights = weights.zip(dw).map { case (w, d) => w + d }
+          println(s"epoch: $epoch, newPocketMistakes: $newPocketMistakes")
           trainEpoch(epoch + 1, newPocketWeights, newPocketMistakes)
         }
       }
@@ -52,7 +53,7 @@ class Perceptron(var weights: List[Double] = List[Double](),
     trainEpoch(epoch = 1, pocketWeights = weights, pocketMistakes = numExamples)
   }
 
-  def predict(X: List[Double]): Int = Perceptron.predict(weights, X)
+  override def inference(X: List[Double]): Int = Perceptron.inference(weights, X)
 
   def linearlySeparates(examples: List[UnitBinaryClassificationExample]): Boolean = {
     Perceptron.linearlySeparates(weights, examples)
@@ -66,7 +67,7 @@ class Perceptron(var weights: List[Double] = List[Double](),
 
 object Perceptron {
 
-  def predict(weights: List[Double], x: List[Double]): Int = {
+  def inference(weights: List[Double], x: List[Double]): Int = {
     val X = List(1.0) ::: x
     val xDim = X.length
     val modDim = weights.length
@@ -79,12 +80,12 @@ object Perceptron {
 
   def linearlySeparates(weights: List[Double],
                         examples: List[UnitBinaryClassificationExample]): Boolean = {
-    !examples.exists(ex => binaryToPosNeg(Perceptron.predict(weights, ex.X)) != ex.y)
+    !examples.exists(ex => Perceptron.inference(weights, ex.X) != ex.y)
   }
 
   def misclassifiedExamples(weights: List[Double], examples: List[UnitBinaryClassificationExample]):
   List[UnitBinaryClassificationExample] = {
-    examples.filter(ex => binaryToPosNeg(Perceptron.predict(weights, ex.X)) != ex.y)
+    examples.filter(ex => Perceptron.inference(weights, ex.X) != ex.y)
   }
 
 }

@@ -5,7 +5,7 @@
 
 package model.votedperceptron
 
-import example.{UnitBinaryClassificationExample, binaryToPosNeg}
+import example.UnitBinaryClassificationExample
 import model.UnitBinaryClassificationModel
 import model.perceptron.Perceptron
 
@@ -16,13 +16,13 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
                       val maxEpochs: Int = MaxEpochs) extends UnitBinaryClassificationModel {
 
   private val random = new Random
-  random.setSeed(TrainSeed)
 
   /**
    * Implements the Voted model.perceptron.Perceptron learning algorithm:
    * - http://curtis.ml.cmu.edu/w/courses/index.php/Voted_Perceptron
    */
-  def learn(examples: List[UnitBinaryClassificationExample]): Unit = {
+  override def learn(examples: List[UnitBinaryClassificationExample]): Unit = {
+    random.setSeed(TrainSeed)
     random.shuffle(examples)
     val numExamples = examples.length
     if (numExamples == 0) throw new IllegalStateException("No training examples passed.")
@@ -37,7 +37,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
         var stillPerfect = true
         while (stillPerfect && curVotes < numExamples) {
           val example = examples(randExampleInds(curVotes))
-          val prediction = Perceptron.predict(curWeights, example.X)
+          val prediction = Perceptron.inference(curWeights, example.X)
           stillPerfect = prediction == example.y
           curVotes = if (stillPerfect) curVotes + 1 else curVotes
         }
@@ -75,14 +75,14 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
     trainEpoch(epoch = 1, pocketWeightVotes = pocketWeightVotes)
   }
 
-  def predict(X: List[Double]): Int = VotedPerceptron.predict(weights, X)
+  override def inference(X: List[Double]): Int = VotedPerceptron.inference(weights, X)
 
 }
 
 object VotedPerceptron {
 
-  def predict(weights: List[(List[Double], Double)], x: List[Double]): Int = {
-    val score = weights.map { case (w, v) => binaryToPosNeg(Perceptron.predict(w, x)) * v }.sum
+  def inference(weights: List[(List[Double], Double)], x: List[Double]): Int = {
+    val score = weights.map { case (w, v) => Perceptron.inference(w, x) * v }.sum
     if (score >= 0) 1 else 0
   }
 

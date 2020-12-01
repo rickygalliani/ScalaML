@@ -9,24 +9,24 @@ import org.scalatest.funsuite.AnyFunSuite
   
 class VotedPerceptronSpec extends AnyFunSuite {
 
-  test("predict() - case 1: 3 dimensions, positive label") {
+  test("inference() - case 1: 3 dimensions, positive label") {
     val vp = new VotedPerceptron()
     vp.weights = List((List(1.0, 2.0, 3.0), 1.0))
-    val prediction = vp.predict(List(1, 1))
+    val prediction = vp.inference(List(1, 1))
     assert(prediction == 1)
   }
 
-  test("predict() - case 2: 3 dimensions, negative label") {
+  test("inference() - case 2: 3 dimensions, negative label") {
     val vp = new VotedPerceptron()
     vp.weights = List((List(-1.0, -2.0, -3.0), 1.0))
-    val prediction = vp.predict(List(1, 1))
+    val prediction = vp.inference(List(1, 1))
     assert(prediction == 0)
   }
 
-  test("predict() - case 3: 3 dimensions, 2 vectors") {
+  test("inference() - case 3: 3 dimensions, 2 vectors") {
     val vp = new VotedPerceptron()
     vp.weights = List((List(1.0, 2.0, 3.0), 0.5), (List(2.0, 4.0, 6.0), 0.5))
-    val prediction = vp.predict(List(1, 1))
+    val prediction = vp.inference(List(1, 1))
     assert(prediction == 1)
   }
 

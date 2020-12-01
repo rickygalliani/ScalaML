@@ -5,13 +5,18 @@
 
 package data.normalize
 
-class MinMaxNormalizer(override val xs: List[Double],
-                       val minValue: Double = 0.0,
-                       val maxValue: Double = 1.0) extends Normalizer(xs) {
+class MinMaxNormalizer(val minValue: Double = 0.0, val maxValue: Double = 1.0) extends Normalizer {
 
-  val minX: Double = xs.min
-  val maxX: Double = xs.max
+  // Store first seen min and max as baseline parameters to normalize future vectors
+  var minSeen: Option[Double] = None
+  var maxSeen: Option[Double] = None
 
-  def normalize(newXs: List[Double]): List[Double] = xs.map(x => ((x - minX) * (maxValue - minValue)) / (maxX - minX))
+  def normalize(xs: List[Double]): List[Double] = {
+    val curMin = xs.min
+    val curMax = xs.max
+    minSeen = Some(this.minSeen.getOrElse(curMin))
+    maxSeen = Some(this.maxSeen.getOrElse(curMax))
+    xs.map(x => ((x - minSeen.get) * (maxValue - minValue)) / (maxSeen.get - minSeen.get))
+  }
 
 }

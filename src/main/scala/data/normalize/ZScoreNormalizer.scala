@@ -5,11 +5,18 @@
 
 package data.normalize
 
-class ZScoreNormalizer(override val xs: List[Double]) extends Normalizer(xs) {
+class ZScoreNormalizer extends Normalizer {
 
-  val meanX: Double = 1.0 * xs.sum / xs.size
-  val stdDevX: Double = math.sqrt(xs.map(x => math.pow(x - meanX, 2)).sum / xs.size)
+  // Store first computed mean and standard deviation as baseline parameters to normalize future vectors
+  var mean: Option[Double] = None
+  var stdDev: Option[Double] = None
 
-  def normalize(xs: List[Double]): List[Double] = xs.map(x => (x - meanX) / stdDevX)
+  def normalize(xs: List[Double]): List[Double] = {
+    val curMean = 1.0 * xs.sum / xs.size
+    val curStdDev = math.sqrt(xs.map(x => math.pow(x - curMean, 2)).sum / xs.size)
+    mean = Some(mean.getOrElse(curMean))
+    stdDev = Some(stdDev.getOrElse(curStdDev))
+    xs.map(x => (x - mean.get) / stdDev.get)
+  }
 
 }

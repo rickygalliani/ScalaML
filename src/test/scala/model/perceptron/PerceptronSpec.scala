@@ -5,10 +5,8 @@
 
 package model.perceptron
 
-import data.TestData.generateBinaryClassificationExamples
-import example.BinaryClassificationExample
-import example.UnitBinaryClassificationExample
 import data.TestData.generateUnitBinaryClassificationExamples
+import example.UnitBinaryClassificationExample
 import org.scalatest.funsuite.AnyFunSuite
 
 class PerceptronSpec extends AnyFunSuite {
@@ -121,17 +119,17 @@ class PerceptronSpec extends AnyFunSuite {
     assert(p.misclassifiedExamples(examples).length == NumOutliers * 2)
   }
 
-  test("predict() - case 1: 3 dimensions, positive label") {
+  test("inference() - case 1: 3 dimensions, positive label") {
     val p = new Perceptron()
     p.weights = List(1.0, 2.0, 3.0)
-    val prediction = p.predict(List(1, 1))
+    val prediction = p.inference(List(1, 1))
     assert(prediction == 1)
   }
 
-  test("predict() - case 2: 3 dimensions, negative label") {
+  test("inference() - case 2: 3 dimensions, negative label") {
     val p = new Perceptron()
     p.weights = List(-1.0, -2.0, -3.0)
-    val prediction = p.predict(List(1, 1))
+    val prediction = p.inference(List(1, 1))
     assert(prediction == 0)
   }
 

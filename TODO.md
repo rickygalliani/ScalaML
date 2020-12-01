@@ -1,5 +1,4 @@
-- Add preprocess module to handle data preprocessing like normalization
-- Add feature normalization to existing models
+- Fix existing bug in predict() or normalize()
 - Add printMetadata() function for each model
 - Add linear regression, logistic regression
 - Create class to store metadata for datasets (add printMetadata() function)

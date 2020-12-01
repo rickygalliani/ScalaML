@@ -61,7 +61,7 @@ object Data {
           queenstownEmbark,
           southamptonEmbark
         )
-        examplesBuffer += new BinaryClassificationExample(X, y = survived)
+        examplesBuffer += new UnitBinaryClassificationExample(X, y = survived)
         index += 1
     }
     val examples = random.shuffle(examplesBuffer.toList)

@@ -5,32 +5,62 @@
 
 package model
 
+import data.normalize.Normalizer
 import example.Example
 
-trait Model[T <: Example] {
+abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None) {
 
   /**
-   * Clients override to process examples (i.e., feature selection, normalization, etc.) before training
+   * Private interface for feature normalization logic used before training and prediction
+   *
+   * @param Xs list of feature vectors
+   * @return list of feature vectors, normalized
+   */
+  protected def normalize(Xs: List[List[Double]]): List[List[Double]] = {
+    normalizer match {
+      case Some(n) =>
+        // Change feature list representation from per-user (row-wise Xs) to per-feature (column-wise features)
+          Xs.transpose.map(xs => n.normalize(xs))
+
+      case _ => Xs // no feature normalization
+    }
+  }
+
+  /**
+   * Clients implement to change type of training examples
+   *
+   * @param examples list of training examples passed from client
+   * @return list of training examples of type expected by learning algorithm
+   */
+  def cast(examples: List[Example]): List[T]
+
+  /**
+   * Clients implement to process examples (i.e., feature selection, normalization, etc.) before training
    *
    * @param examples list of training examples for preprocessing
    * @return list of training examples to be used in learning algorithm
    */
-  def preprocess(examples: List[Example]): List[T]
+  final def preprocess(examples: List[Example]): List[T] = {
+    val normalizedXs = normalize(examples.map(_.X))
+    val ys = examples.map(_.y)
+    val exs: List[Example] = normalizedXs.zip(ys).map { case (x, y) => new Example(x, y) }
+    cast(exs)
+  }
 
   /**
-   * Clients override to implement learning algorithm and updatie internal state with learned parameters
+   * Clients implement to implement learning algorithm and updatie internal state with learned parameters
    *
    * @param examples list of processed training examples
    */
   protected def learn(examples: List[T]): Unit
 
   /**
-   * Clients override to implement model inference
+   * Clients implement to define model inference on a single feature vector
    *
    * @param X a feature vector
    * @return a prediction
    */
-  def predict(X: List[Double]): Int
+  def inference(X: List[Double]): Int
 
   /**
    * Public interface for model training
@@ -42,11 +72,23 @@ trait Model[T <: Example] {
   }
 
   /**
+   * Public interface for model inference on a single feature vector
+   *
+   * @param X a feature vector
+   * @return a prediction
+   */
+  final def predict(X: List[Double]): Int = {
+    inference(normalize(List(X)).head)
+  }
+
+  /**
    * Public interface for batch prediction
    *
    * @param Xs a list of feature vectors
    * @return a list of predictions
    */
-  final def predictBatch(Xs: List[List[Double]]): List[Int] = Xs.map(predict)
+  final def predictBatch(Xs: List[List[Double]]): List[Int] = {
+    normalize(Xs).map(inference)
+  }
 
 }

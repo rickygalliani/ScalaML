@@ -5,29 +5,30 @@
 
 package model
 
+import data.normalize.{Normalizer, MinMaxNormalizer}
 import example.{BinaryClassificationExample, Example, UnitBinaryClassificationExample}
 
-abstract class BinaryClassificationModel extends Model[BinaryClassificationExample]{
+abstract class BinaryClassificationModel extends Model[BinaryClassificationExample] {
 
-  def preprocess(examples: List[Example]): List[BinaryClassificationExample] = {
+  override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer())
+
+  def cast(examples: List[Example]): List[BinaryClassificationExample] = {
     examples.map(e => BinaryClassificationExample(e))
   }
 
   protected def learn(examples: List[BinaryClassificationExample]): Unit
 
-  def predict(X: List[Double]): Int
-
 }
 
-abstract class UnitBinaryClassificationModel extends Model[UnitBinaryClassificationExample]{
+abstract class UnitBinaryClassificationModel extends Model[UnitBinaryClassificationExample] {
 
-  def preprocess(examples: List[Example]): List[UnitBinaryClassificationExample] = {
+  override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer())
+
+  def cast(examples: List[Example]): List[UnitBinaryClassificationExample] = {
     examples.map(e => UnitBinaryClassificationExample(e))
   }
 
   protected def learn(examples: List[UnitBinaryClassificationExample]): Unit
-
-  def predict(X: List[Double]): Int
 
 }
 
