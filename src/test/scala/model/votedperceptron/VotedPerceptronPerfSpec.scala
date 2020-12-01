@@ -3,9 +3,9 @@
  * Email: pjgalliani@gmail.com
  */
 
-package votedperceptron
+package model.votedperceptron
 
-import example.BinaryClassificationExample
+import example.UnitBinaryClassificationExample
 import org.scalameter.api._
 import data.TestData
 
@@ -18,10 +18,10 @@ object VotedPerceptronPerfSpec extends Bench.LocalTime {
 
   val TestSizes: Gen[Int] = Gen.range("numExamples")(MinSize, MaxSize, StepSize)
 
-  val LinearlySeparableExamples: List[BinaryClassificationExample] =
-    TestData.generateBinaryClassificationExamples(MaxSize, 0)
-  val LinearlyInseparableExamples: List[BinaryClassificationExample] =
-    TestData.generateBinaryClassificationExamples(MaxSize, NumOutliers)
+  val LinearlySeparableExamples: List[UnitBinaryClassificationExample] =
+    TestData.generateUnitBinaryClassificationExamples(MaxSize, 0)
+  val LinearlyInseparableExamples: List[UnitBinaryClassificationExample] =
+    TestData.generateUnitBinaryClassificationExamples(MaxSize, NumOutliers)
 
   performance of "Linearly Inseparable Case: VotedPerceptron" in {
     measure method "train" in {

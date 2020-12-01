@@ -5,5 +5,5 @@
 - Create class to store metadata for datasets (add printMetadata() function)
 - Load more binary classification datasets from Kaggle
 - Is Recall computation correct? 
-- Minimize passes through set of examples in VotedPerceptron and perceptron.Perceptron
+- Minimize passes through set of examples in VotedPerceptron and model.perceptron.Perceptron
 - Write tests for BinaryPerformance functions

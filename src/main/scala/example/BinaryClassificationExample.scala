@@ -12,3 +12,13 @@ class BinaryClassificationExample(override val X: List[Double],
   assert(y == positiveValue || y == negativeValue)
 }
 
+object BinaryClassificationExample {
+
+  def apply(e: Example, positiveValue: Int = 1, negativeValue: Int = 0): BinaryClassificationExample = {
+    new BinaryClassificationExample(e.X, e.y, positiveValue, negativeValue)
+  }
+
+}
+
+
+

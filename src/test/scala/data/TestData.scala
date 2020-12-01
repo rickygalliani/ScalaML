@@ -5,7 +5,7 @@
 
 package data
 
-import example.BinaryClassificationExample
+import example.{Example, BinaryClassificationExample, UnitBinaryClassificationExample}
 
 object TestData {
 
@@ -23,6 +23,12 @@ object TestData {
       }
       exs
     }
+  }
+
+  def generateUnitBinaryClassificationExamples(numExamples: Int,
+                                               numOutliers: Int): List[UnitBinaryClassificationExample] = {
+    generateBinaryClassificationExamples(numExamples, numOutliers)
+      .map(e => UnitBinaryClassificationExample(new Example(e.X, if (e.y == 0) -1 else 1)))
   }
   
 }

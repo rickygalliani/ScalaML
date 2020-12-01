@@ -3,7 +3,7 @@
  * Email: pjgalliani@gmail.com
  */
 
-package votedperceptron
+package model.votedperceptron
 
 case class WeightVotes(weights: List[List[Double]] = List[List[Double]](), votes: List[Int] = List[Int]()) {
 

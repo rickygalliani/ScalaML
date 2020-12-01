@@ -17,5 +17,4 @@ package object example {
     else if (y == 1) { 1 }
     else { throw new Exception(s"Unrecognized label y in posNegToBinary(): $y") }
   }
-
 }

@@ -6,10 +6,10 @@
 import Config.LogLevelSeed
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.scala.Logging
-import perceptron.Perceptron
+import model.perceptron.Perceptron
 import performance.BinaryPerformance
 import data.Data
-import votedperceptron.VotedPerceptron
+import model.votedperceptron.VotedPerceptron
 
 object Main extends App with Logging {
 

@@ -3,9 +3,9 @@
  * Email: pjgalliani@gmail.com
  */
 
-package perceptron
+package model.perceptron
 
-import example.{BinaryClassificationExample, Example}
+import example.{UnitBinaryClassificationExample, Example}
 import org.scalameter.api._
 import data.TestData
 
@@ -18,12 +18,12 @@ object PerceptronPerfSpec extends Bench.LocalTime {
 
   val TestSizes: Gen[Int] = Gen.range("numExamples")(MinSize, MaxSize, StepSize)
 
-  val LinearlySeparableExamples: List[BinaryClassificationExample] =
-    TestData.generateBinaryClassificationExamples(MaxSize, 0)
-  val LinearlyInseparableExamples: List[BinaryClassificationExample] =
-    TestData.generateBinaryClassificationExamples(MaxSize, NumOutliers)
+  val LinearlySeparableExamples: List[UnitBinaryClassificationExample] =
+    TestData.generateUnitBinaryClassificationExamples(MaxSize, 0)
+  val LinearlyInseparableExamples: List[UnitBinaryClassificationExample] =
+    TestData.generateUnitBinaryClassificationExamples(MaxSize, NumOutliers)
 
-  performance of "Linearly Inseparable Case: perceptron.Perceptron" in {
+  performance of "Linearly Inseparable Case: model.perceptron.Perceptron" in {
     measure method "train" in {
       using(TestSizes) in { numExamples =>
         val p = new Perceptron()
@@ -33,7 +33,7 @@ object PerceptronPerfSpec extends Bench.LocalTime {
     }
   }
 
-  performance of "Linearly Separable Case: perceptron.Perceptron" in {
+  performance of "Linearly Separable Case: model.perceptron.Perceptron" in {
     measure method "train" in {
       using(TestSizes) in { numExamples =>
         val p = new Perceptron()
