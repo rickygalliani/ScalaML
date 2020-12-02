@@ -8,18 +8,18 @@ package data.normalize
 class MeanNormalizer extends Normalizer {
 
   // Store first seen min, max, and mean as baseline parameters to normalize future vectors
-  var minX: Option[Double] = None
-  var maxX: Option[Double] = None
-  var meanX: Option[Double] = None
+  var minX: Map[Int, Double] = Map[Int, Double]()
+  var maxX: Map[Int, Double] = Map[Int, Double]()
+  var meanX: Map[Int, Double] = Map[Int, Double]()
 
   def normalize(index: Int, xs: List[Double]): List[Double] = {
     val curMin = xs.min
     val curMax = xs.max
     val curMean = 1.0 * xs.sum / xs.size
-    minX = Some(this.minX.getOrElse(curMin))
-    maxX = Some(this.maxX.getOrElse(curMax))
-    meanX = Some(this.meanX.getOrElse(curMean))
-    xs.map(x => (x - meanX.get) / (this.maxX.get - this.minX.get))
+    if (!minX.contains(index)) minX += (index -> curMin)
+    if (!maxX.contains(index)) maxX += (index -> curMax)
+    if (!meanX.contains(index)) meanX += (index -> curMean)
+    xs.map(x => (x - meanX(index)) / (maxX(index) - minX(index)))
   }
 
 }

@@ -11,7 +11,7 @@ import example.Example
 abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None) {
 
   /**
-   * Private interface for feature normalization logic used before training and prediction
+   * Private interface for feature normalization used before training and prediction
    *
    * @param Xs list of feature vectors
    * @return list of feature vectors, normalized

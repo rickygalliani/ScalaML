@@ -130,14 +130,14 @@ class PerceptronSpec extends AnyFunSuite {
     val p = new Perceptron()
     p.weights = List(-1.0, -2.0, -3.0)
     val prediction = p.inference(List(1, 1))
-    assert(prediction == 0)
+    assert(prediction == -1)
   }
 
   test("predictBatch() - case 1: positive label, negative label") {
     val p = new Perceptron()
     p.weights = List(1.0, 2.0, 3.0)
     val prediction = p.predictBatch(List(List(1, 1), List(-1, -1)))
-    assert(prediction == List(1, 0))
+    assert(prediction == List(1, -1))
   }
 
 }

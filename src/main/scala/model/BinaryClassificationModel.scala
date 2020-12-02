@@ -10,7 +10,7 @@ import example.{BinaryClassificationExample, Example, UnitBinaryClassificationEx
 
 abstract class BinaryClassificationModel extends Model[BinaryClassificationExample] {
 
-  override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer())
+  override val normalizer: Option[Normalizer] = None
 
   def cast(examples: List[Example]): List[BinaryClassificationExample] = {
     examples.map(e => BinaryClassificationExample(e))
@@ -22,7 +22,7 @@ abstract class BinaryClassificationModel extends Model[BinaryClassificationExamp
 
 abstract class UnitBinaryClassificationModel extends Model[UnitBinaryClassificationExample] {
 
-  override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer())
+  override val normalizer: Option[Normalizer] = None
 
   def cast(examples: List[Example]): List[UnitBinaryClassificationExample] = {
     examples.map(e => UnitBinaryClassificationExample(e))

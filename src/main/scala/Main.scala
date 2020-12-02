@@ -42,8 +42,8 @@ Test Examples: ${testExamples.length}
   val pTrainPredictions = perceptron.predictBatch(trainX)
   val pTestPredictions = perceptron.predictBatch(testX)
   // Compute Precision, Recall for train and test sets
-  val pTrainMetrics = BinaryPerformance.computeMetrics(pTrainPredictions, trainY)
-  val pTestMetrics = BinaryPerformance.computeMetrics(pTestPredictions, testY)
+  val pTrainMetrics = BinaryPerformance.computeMetrics(pTrainPredictions, trainY, negativeClass = -1)
+  val pTestMetrics = BinaryPerformance.computeMetrics(pTestPredictions, testY, negativeClass = -1)
   logger(main, s"""\n=== Perceptron ===\n= Train =\n${pTrainMetrics.report}\n= Test =\n${pTestMetrics.report}""")
 
   // Train VotedPerceptron
@@ -53,8 +53,8 @@ Test Examples: ${testExamples.length}
   val vpTrainPredictions = votedPerceptron.predictBatch(trainX)
   val vpTestPredictions = votedPerceptron.predictBatch(testX)
   // Compute Precision, Recall for train and test sets
-  val vpTrainMetrics = BinaryPerformance.computeMetrics(vpTrainPredictions, trainY)
-  val vpTestMetrics = BinaryPerformance.computeMetrics(vpTestPredictions, testY)
+  val vpTrainMetrics = BinaryPerformance.computeMetrics(vpTrainPredictions, trainY, negativeClass = -1)
+  val vpTestMetrics = BinaryPerformance.computeMetrics(vpTestPredictions, testY, negativeClass = -1)
   logger(main, s"""\n=== VotedPerceptron ===\n= Train =\n${vpTrainMetrics.report}\n= Test =\n${vpTestMetrics.report}""")
 
 }

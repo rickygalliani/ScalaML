@@ -81,7 +81,7 @@ object VotedPerceptron {
 
   def inference(weights: List[(List[Double], Double)], x: List[Double]): Int = {
     val score = weights.map { case (w, v) => Perceptron.inference(w, x) * v }.sum
-    if (score >= 0) 1 else 0
+    if (score >= 0) 1 else -1
   }
 
 }

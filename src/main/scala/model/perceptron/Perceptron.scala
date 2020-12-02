@@ -18,8 +18,6 @@ class Perceptron(var weights: List[Double] = List[Double](),
 
   override def learn(examples: List[UnitBinaryClassificationExample]): Unit = {
 
-    println(s"examples = ${examples.take(5).mkString("\n")}")
-
     random.setSeed(TrainSeed)
     random.shuffle(examples)
     val numExamples = examples.length
@@ -41,7 +39,6 @@ class Perceptron(var weights: List[Double] = List[Double](),
           val dw = (List(1.0) ::: randomMistake.X).map(d => d * randomMistake.y)
           // Update weights: w = w + x * y where (x, y) is a random misclassified example
           weights = weights.zip(dw).map { case (w, d) => w + d }
-          println(s"epoch: $epoch, newPocketMistakes: $newPocketMistakes, weights: ${weights.mkString(",")}")
           trainEpoch(epoch + 1, newPocketWeights, newPocketMistakes)
         }
       }
@@ -74,7 +71,7 @@ object Perceptron {
       throw new IllegalStateException(s"Dimension of feature vector ($xDim) and model ($modDim) don't match.")
     }
     val score = weights.zip(X).map { case (w, v) => w * v }.sum
-    if (score >= 0) 1 else 0
+    if (score >= 0) 1 else -1
   }
 
   def linearlySeparates(weights: List[Double],

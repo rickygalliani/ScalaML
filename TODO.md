@@ -1,7 +1,6 @@
-- Fix existing bug in predict() or normalize()
-- Change all Normalizers to be per-feature
+- Add logistic regression
 - Add printMetadata() function for each model
-- Add linear regression, logistic regression
+- Add linear regression
 - Create class to store metadata for datasets (add printMetadata() function)
 - Load more binary classification datasets from Kaggle
 - Is Recall computation correct? 
