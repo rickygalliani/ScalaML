@@ -17,6 +17,9 @@ class Perceptron(var weights: List[Double] = List[Double](),
   private val random = new Random
 
   override def learn(examples: List[UnitBinaryClassificationExample]): Unit = {
+
+    println(s"examples = ${examples.take(5).mkString("\n")}")
+
     random.setSeed(TrainSeed)
     random.shuffle(examples)
     val numExamples = examples.length
@@ -31,18 +34,14 @@ class Perceptron(var weights: List[Double] = List[Double](),
         if (numMistakes > 0) {
           // Save best weights and number of mistakes "in pocket"
           val (newPocketWeights, newPocketMistakes) = {
-            if (numMistakes <= pocketMistakes) {
-              (weights, numMistakes)
-            }
-            else {
-              (pocketWeights, pocketMistakes)
-            }
+            if (numMistakes <= pocketMistakes) { (weights, numMistakes) }
+            else { (pocketWeights, pocketMistakes) }
           }
           val randomMistake = mistakes(random.nextInt(numMistakes))
           val dw = (List(1.0) ::: randomMistake.X).map(d => d * randomMistake.y)
           // Update weights: w = w + x * y where (x, y) is a random misclassified example
           weights = weights.zip(dw).map { case (w, d) => w + d }
-          println(s"epoch: $epoch, newPocketMistakes: $newPocketMistakes")
+          println(s"epoch: $epoch, newPocketMistakes: $newPocketMistakes, weights: ${weights.mkString(",")}")
           trainEpoch(epoch + 1, newPocketWeights, newPocketMistakes)
         }
       }

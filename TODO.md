@@ -1,4 +1,5 @@
 - Fix existing bug in predict() or normalize()
+- Change all Normalizers to be per-feature
 - Add printMetadata() function for each model
 - Add linear regression, logistic regression
 - Create class to store metadata for datasets (add printMetadata() function)

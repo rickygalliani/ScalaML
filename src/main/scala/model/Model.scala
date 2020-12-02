@@ -20,8 +20,7 @@ abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None) {
     normalizer match {
       case Some(n) =>
         // Change feature list representation from per-user (row-wise Xs) to per-feature (column-wise features)
-          Xs.transpose.map(xs => n.normalize(xs))
-
+        Xs.transpose.zipWithIndex.map { case (xs, index) => n.normalize(index, xs) }.transpose
       case _ => Xs // no feature normalization
     }
   }

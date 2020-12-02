@@ -11,7 +11,7 @@ class ZScoreNormalizer extends Normalizer {
   var mean: Option[Double] = None
   var stdDev: Option[Double] = None
 
-  def normalize(xs: List[Double]): List[Double] = {
+  def normalize(index: Int, xs: List[Double]): List[Double] = {
     val curMean = 1.0 * xs.sum / xs.size
     val curStdDev = math.sqrt(xs.map(x => math.pow(x - curMean, 2)).sum / xs.size)
     mean = Some(mean.getOrElse(curMean))

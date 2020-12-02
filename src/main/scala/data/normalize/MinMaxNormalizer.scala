@@ -8,15 +8,15 @@ package data.normalize
 class MinMaxNormalizer(val minValue: Double = 0.0, val maxValue: Double = 1.0) extends Normalizer {
 
   // Store first seen min and max as baseline parameters to normalize future vectors
-  var minSeen: Option[Double] = None
-  var maxSeen: Option[Double] = None
+  var minSeen: Map[Int, Double] = Map[Int, Double]()
+  var maxSeen: Map[Int, Double] = Map[Int, Double]()
 
-  def normalize(xs: List[Double]): List[Double] = {
+  def normalize(index: Int, xs: List[Double]): List[Double] = {
     val curMin = xs.min
     val curMax = xs.max
-    minSeen = Some(this.minSeen.getOrElse(curMin))
-    maxSeen = Some(this.maxSeen.getOrElse(curMax))
-    xs.map(x => ((x - minSeen.get) * (maxValue - minValue)) / (maxSeen.get - minSeen.get))
+    if (!minSeen.contains(index)) { minSeen += (index -> curMin) }
+    if (!maxSeen.contains(index)) { maxSeen += (index -> curMax) }
+    xs.map(x => ((x - minSeen(index)) * (maxValue - minValue)) / (maxSeen(index) - minSeen(index)))
   }
 
 }

@@ -47,9 +47,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
           // Update current weights: w = w + x * y where (x, y) is a random misclassified example
           val mistakes = Perceptron.misclassifiedExamples(curWeights, examples)
           val numMistakes = mistakes.size
-          if (numMistakes == 0) {
-            weights = pocketWeightVotes.getFinalWeights
-          }
+          if (numMistakes == 0) { weights = pocketWeightVotes.getFinalWeights }
           else {
             val randomMistake = mistakes(random.nextInt(numMistakes))
             val dw = (List(1.0) ::: randomMistake.X).map(_ * randomMistake.y)

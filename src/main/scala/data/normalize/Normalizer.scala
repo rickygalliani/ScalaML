@@ -6,5 +6,5 @@
 package data.normalize
 
 abstract class Normalizer {
-  def normalize(xs: List[Double]): List[Double]
+  def normalize(index: Int, xs: List[Double]): List[Double]
 }

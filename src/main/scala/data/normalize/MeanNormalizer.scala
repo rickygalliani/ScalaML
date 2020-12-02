@@ -12,7 +12,7 @@ class MeanNormalizer extends Normalizer {
   var maxX: Option[Double] = None
   var meanX: Option[Double] = None
 
-  def normalize(xs: List[Double]): List[Double] = {
+  def normalize(index: Int, xs: List[Double]): List[Double] = {
     val curMin = xs.min
     val curMax = xs.max
     val curMean = 1.0 * xs.sum / xs.size
