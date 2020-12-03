@@ -59,16 +59,14 @@ abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None) {
    * @param X a feature vector
    * @return a prediction
    */
-  def inference(X: List[Double]): Int
+  def inference(X: List[Double]): Double
 
   /**
    * Public interface for model training
    *
    * @param examples a list of examples, unprocessed
    */
-  final def train(examples: List[Example]): Unit = {
-    learn(preprocess(examples))
-  }
+  final def train(examples: List[Example]): Unit = learn(preprocess(examples))
 
   /**
    * Public interface for model inference on a single feature vector
@@ -76,9 +74,7 @@ abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None) {
    * @param X a feature vector
    * @return a prediction
    */
-  final def predict(X: List[Double]): Int = {
-    inference(normalize(List(X)).head)
-  }
+  final def predict(X: List[Double]): Double = inference(normalize(List(X)).head)
 
   /**
    * Public interface for batch prediction
@@ -86,8 +82,6 @@ abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None) {
    * @param Xs a list of feature vectors
    * @return a list of predictions
    */
-  final def predictBatch(Xs: List[List[Double]]): List[Int] = {
-    normalize(Xs).map(inference)
-  }
+  final def predictBatch(Xs: List[List[Double]]): List[Double] = normalize(Xs).map(inference)
 
 }

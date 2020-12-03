@@ -5,7 +5,7 @@
 
 package example
 
-case class UnitBinaryClassificationExample(override val X: List[Double], override val y: Int)
+case class UnitBinaryClassificationExample(override val X: List[Double], override val y: Double)
   extends BinaryClassificationExample(X, y, positiveValue = 1, negativeValue = -1)
 
 object UnitBinaryClassificationExample {

@@ -101,10 +101,10 @@ F2 Score: $f2Score
 
   }
 
-  def computeMetrics(predictions: List[Int],
-                     labels: List[Int],
-                     positiveClass: Int = 1,
-                     negativeClass: Int = 0): BinaryClassificationMetrics = {
+  def computeMetrics(predictions: List[Double],
+                     labels: List[Double],
+                     positiveClass: Double = 1,
+                     negativeClass: Double = 0): BinaryClassificationMetrics = {
     assert(predictions.forall(p => p == positiveClass || p == negativeClass))
     assert(labels.forall(p => p == positiveClass || p == negativeClass))
 

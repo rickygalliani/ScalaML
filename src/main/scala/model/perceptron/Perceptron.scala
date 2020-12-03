@@ -49,7 +49,7 @@ class Perceptron(var weights: List[Double] = List[Double](),
     trainEpoch(epoch = 1, pocketWeights = weights, pocketMistakes = numExamples)
   }
 
-  override def inference(X: List[Double]): Int = Perceptron.inference(weights, X)
+  override def inference(X: List[Double]): Double = Perceptron.inference(weights, X)
 
   def linearlySeparates(examples: List[UnitBinaryClassificationExample]): Boolean = {
     Perceptron.linearlySeparates(weights, examples)
@@ -63,7 +63,7 @@ class Perceptron(var weights: List[Double] = List[Double](),
 
 object Perceptron {
 
-  def inference(weights: List[Double], x: List[Double]): Int = {
+  def inference(weights: List[Double], x: List[Double]): Double = {
     val X = List(1.0) ::: x
     val xDim = X.length
     val modDim = weights.length

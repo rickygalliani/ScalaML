@@ -47,7 +47,7 @@ object Data {
         val cherbourgEmbark = row(8).toDouble
         val queenstownEmbark = row(9).toDouble
         val southamptonEmbark = row(10).toDouble
-        val survived = row(11).toInt
+        val survived = row(11).toDouble
         val X = List(
           upperClass,
           middleClass,
@@ -61,7 +61,7 @@ object Data {
           queenstownEmbark,
           southamptonEmbark
         )
-        examplesBuffer += new UnitBinaryClassificationExample(X, y = survived)
+        examplesBuffer += new BinaryClassificationExample(X, y = survived)
         index += 1
     }
     val examples = random.shuffle(examplesBuffer.toList)

@@ -73,13 +73,13 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
     trainEpoch(epoch = 1, pocketWeightVotes = pocketWeightVotes)
   }
 
-  override def inference(X: List[Double]): Int = VotedPerceptron.inference(weights, X)
+  override def inference(X: List[Double]): Double = VotedPerceptron.inference(weights, X)
 
 }
 
 object VotedPerceptron {
 
-  def inference(weights: List[(List[Double], Double)], x: List[Double]): Int = {
+  def inference(weights: List[(List[Double], Double)], x: List[Double]): Double = {
     val score = weights.map { case (w, v) => Perceptron.inference(w, x) * v }.sum
     if (score >= 0) 1 else -1
   }

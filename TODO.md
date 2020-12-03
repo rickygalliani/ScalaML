@@ -1,4 +1,6 @@
-- Add logistic regression
+- Add unit tests for logistic regression
+- Add decision tree
+- Add support vector machine
 - Add printMetadata() function for each model
 - Add linear regression
 - Create class to store metadata for datasets (add printMetadata() function)

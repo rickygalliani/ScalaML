@@ -6,9 +6,9 @@
 package example
 
 class BinaryClassificationExample(override val X: List[Double],
-                                  override val y: Int,
-                                  positiveValue: Int = 1,
-                                  negativeValue: Int = 0) extends Example(X, y) {
+                                  override val y: Double,
+                                  positiveValue: Double = 1,
+                                  negativeValue: Double = 0) extends Example(X, y) {
   assert(y == positiveValue || y == negativeValue)
 }
 
