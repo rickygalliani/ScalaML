@@ -4,65 +4,78 @@
  */
 
 import Config.LogLevelSeed
+import data.Data.loadCSVExamples
+import data.Split.trainTestSplit
+import model.logisticregression.LogisticRegression
+import model.perceptron.Perceptron
+import model.votedperceptron.VotedPerceptron
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.scala.Logging
-import model.perceptron.Perceptron
-import performance.BinaryPerformance
-import data.Data
-import model.logisticregression.LogisticRegression
-import model.votedperceptron.VotedPerceptron
+import performance.BinaryPerformance.computeMetrics
 
 object Main extends App with Logging {
 
   val main: Level = Level.forName("main", LogLevelSeed)
 
-  // Dataset
-  val titanicFilePath = "/Users/pjgalliani/Code/scalaml/Titanic.csv"
-  val (trainExamples, testExamples) = Data.loadTitanicExamples(filePath = titanicFilePath)
-  val trainX = trainExamples.map(ex => ex.X)
-  val testX = testExamples.map(ex => ex.X)
-  val trainY = trainExamples.map(ex => ex.y)
-  val testY = testExamples.map(ex => ex.y)
+  val datasets = Seq(
+    "/Users/pjgalliani/Code/scalaml/Titanic.csv",
+    "/Users/pjgalliani/Code/scalaml/NBA5YearNoName.csv",
+  )
+  
+  datasets.foreach { filePath =>
+    // Dataset
+    val examples = loadCSVExamples(filePath)
+    val (trainExamples, testExamples) = trainTestSplit(examples)
+    val trainX = trainExamples.map(ex => ex.X)
+    val testX = testExamples.map(ex => ex.X)
+    val trainY = trainExamples.map(ex => ex.y)
+    val testY = testExamples.map(ex => ex.y)
 
-  logger(main,
-s"""
-=== Dataset ===
+    logger(main,
+      s"""
+=== Dataset ($filePath) ===
 Features: ${trainExamples.head.X.length}
 Train Examples: ${trainExamples.length}
   Positive Examples: ${trainY.filter(_ == 1).sum.toInt}
-  Negative Examples: ${(trainY.filter(_ == 1).sum - trainY.sum.toInt)}
+  Negative Examples: ${(trainY.size - trainY.filter(_ == 1).sum).toInt}
 Test Examples: ${testExamples.length}
   Positive Examples: ${testY.filter(_ == 1).sum.toInt}
-  Negative Examples: ${(testY.filter(_ == 1).sum - testY.sum).toInt}
+  Negative Examples: ${(testY.size - testY.filter(_ == 1).sum).toInt}
 """)
 
-//  // Train Perceptron
-//  val perceptron = new Perceptron()
-//  perceptron.train(trainExamples)
-//  val pTrainPredictions = perceptron.predictBatch(trainX)
-//  val pTestPredictions = perceptron.predictBatch(testX)
-//  val pTrainMetrics = BinaryPerformance.computeMetrics(pTrainPredictions, trainY, negativeClass = -1)
-//  val pTestMetrics = BinaryPerformance.computeMetrics(pTestPredictions, testY, negativeClass = -1)
-//  logger(main, s"""\n=== Perceptron ===\n= Train =\n${pTrainMetrics.report}\n= Test =\n${pTestMetrics.report}""")
-//
-//  // Train VotedPerceptron
-//  val votedPerceptron = new VotedPerceptron()
-//  votedPerceptron.train(trainExamples)
-//  val vpTrainPredictions = votedPerceptron.predictBatch(trainX)
-//  val vpTestPredictions = votedPerceptron.predictBatch(testX)
-//  val vpTrainMetrics = BinaryPerformance.computeMetrics(vpTrainPredictions, trainY, negativeClass = -1)
-//  val vpTestMetrics = BinaryPerformance.computeMetrics(vpTestPredictions, testY, negativeClass = -1)
-//  logger(main, s"""\n=== VotedPerceptron ===\n= Train =\n${vpTrainMetrics.report}\n= Test =\n${vpTestMetrics.report}""")
+    // Perceptron
+    val perceptron = new Perceptron()
+    perceptron.train(trainExamples)
+    val pTrPredictions = perceptron.predictBatch(trainX)
+    val pTsPredictions = perceptron.predictBatch(testX)
+    val pTrainMetrics = computeMetrics(pTrPredictions, trainY, negativeClassPrediction = -1)
+    val pTestMetrics = computeMetrics(pTsPredictions, testY, negativeClassPrediction = -1)
+    logger(
+      main, s"""\n=== Perceptron ===\n= Train =\n${pTrainMetrics.report}\n= Test =\n${pTestMetrics.report}"""
+    )
 
-  // Train LogisticRegression
-  val logisticRegression = new LogisticRegression()
-  logisticRegression.train(trainExamples)
-  val lrTrainPredictions = logisticRegression.predictBatch(trainX).map(p => if (p > 0.6) 1.0 else 0.0)
-  val lrTestPredictions = logisticRegression.predictBatch(testX).map(p => if (p > 0.6) 1.0 else 0.0)
-  val lrTrainMetrics = BinaryPerformance.computeMetrics(lrTrainPredictions, trainY)
-  val lrTestMetrics = BinaryPerformance.computeMetrics(lrTestPredictions, testY)
-  logger(
-    main, s"""\n=== LogisticRegression ===\n= Train =\n${lrTrainMetrics.report}\n= Test =\n${lrTestMetrics.report}"""
-  )
+    // VotedPerceptron
+    val votedPerceptron = new VotedPerceptron()
+    votedPerceptron.train(trainExamples)
+    val vpTrPredictions = votedPerceptron.predictBatch(trainX)
+    val vpTsPredictions = votedPerceptron.predictBatch(testX)
+    val vpTrainMetrics = computeMetrics(vpTrPredictions, trainY, negativeClassPrediction = -1)
+    val vpTestMetrics = computeMetrics(vpTsPredictions, testY, negativeClassPrediction = -1)
+    logger(
+      main, s"""\n=== VotedPerceptron ===\n= Train =\n${vpTrainMetrics.report}\n= Test =\n${vpTestMetrics.report}"""
+    )
+
+    // LogisticRegression
+    val logisticRegression = new LogisticRegression()
+    logisticRegression.train(trainExamples)
+    val lrTrPredictions = logisticRegression.predictBatch(trainX).map(p => if (p > 0.6) 1.0 else 0.0)
+    val lrTsPredictions = logisticRegression.predictBatch(testX).map(p => if (p > 0.6) 1.0 else 0.0)
+    val lrTrainMetrics = computeMetrics(lrTrPredictions, trainY)
+    val lrTestMetrics = computeMetrics(lrTsPredictions, testY)
+    logger(
+      main, s"""\n=== LogisticRegression ===\n= Train =\n${lrTrainMetrics.report}\n= Test =\n${lrTestMetrics.report}"""
+    )
+
+  }
 
 }

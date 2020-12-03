@@ -11,7 +11,7 @@ case class UnitBinaryClassificationExample(override val X: List[Double], overrid
 object UnitBinaryClassificationExample {
 
   def apply(e: Example): UnitBinaryClassificationExample = {
-    new UnitBinaryClassificationExample(e.X, e.y)
+    new UnitBinaryClassificationExample(e.X, binaryToPosNeg(e.y))
   }
 
 }

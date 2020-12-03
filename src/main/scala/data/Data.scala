@@ -5,8 +5,7 @@
 
 package data
 
-import example.UnitBinaryClassificationExample
-import example.BinaryClassificationExample
+import example.{BinaryClassificationExample, Example}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -14,7 +13,7 @@ import scala.util.Random
 object Data {
 
   private val random = new Random
-  random.setSeed(22L)
+  random.setSeed(DataSeed)
 
 	def generateRandomBinaryExamples(numExamples: Int,
                                    numDimensions: Int,
@@ -28,48 +27,24 @@ object Data {
     }
   }
 
-  def loadTitanicExamples(filePath: String, trainFraction: Double = 0.8):
-  (List[BinaryClassificationExample], List[BinaryClassificationExample]) = {
-
-    var examplesBuffer = ArrayBuffer[BinaryClassificationExample]()
+  /**
+   * Loads a list of training examples from the local machine
+   *
+   * @param filePath absolute file path to csv data file
+   * @param delimiter string separating columns (default: ',')
+   * @return
+   */
+  def loadCSVExamples(filePath: String, delimiter: String = ","): List[Example] = {
+    var examplesBuffer = ArrayBuffer[Example]()
     var index = 0
-    val bufferedSource = io.Source.fromFile(filePath).getLines.drop(1)
-    for (line <- bufferedSource) {  // Skip the header line
-        val row = line.split(",").map(_.trim)
-        val upperClass = row(0).toDouble
-        val middleClass = row(1).toDouble
-        val lowerClass = row(2).toDouble
-        val gender = row(3).toDouble
-        val age = row(4).toDouble
-        val sibSp = row(5).toDouble
-        val parch = row(6).toDouble
-        val fare = row(7).toDouble
-        val cherbourgEmbark = row(8).toDouble
-        val queenstownEmbark = row(9).toDouble
-        val southamptonEmbark = row(10).toDouble
-        val survived = row(11).toDouble
-        val X = List(
-          upperClass,
-          middleClass,
-          lowerClass,
-          gender,
-          age,
-          sibSp,
-          parch,
-          fare,
-          cherbourgEmbark,
-          queenstownEmbark,
-          southamptonEmbark
-        )
-        examplesBuffer += new BinaryClassificationExample(X, y = survived)
-        index += 1
+    val bufferedSource = io.Source.fromFile(filePath)
+    for (line <- bufferedSource.getLines.drop(1)) {  // Skip the header line
+      val row = line.split(delimiter).map(_.trim).map(_.toDouble).toList
+      examplesBuffer += new Example(X = row.dropRight(1), y = row.last)
+      index += 1
     }
-    val examples = random.shuffle(examplesBuffer.toList)
-    val numExamples = examples.length
-    val numTrainExamples = (numExamples * trainFraction).toInt
-    val trainExamples = examples.slice(0, numTrainExamples)
-    val testExamples = examples.slice(numTrainExamples + 1, numExamples)
-    (trainExamples, testExamples)
+    bufferedSource.close
+    examplesBuffer.toList
   }
 
 }

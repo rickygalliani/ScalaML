@@ -103,10 +103,12 @@ F2 Score: $f2Score
 
   def computeMetrics(predictions: List[Double],
                      labels: List[Double],
-                     positiveClass: Double = 1,
-                     negativeClass: Double = 0): BinaryClassificationMetrics = {
-    assert(predictions.forall(p => p == positiveClass || p == negativeClass))
-    assert(labels.forall(p => p == positiveClass || p == negativeClass))
+                     positiveClassPrediction: Double = 1,
+                     negativeClassPrediction: Double = 0,
+                     positiveClassLabel: Double = 1,
+                     negativeClassLabel: Double = 0): BinaryClassificationMetrics = {
+    assert(predictions.forall(p => p == positiveClassPrediction || p == negativeClassPrediction))
+    assert(labels.forall(l => l == positiveClassLabel || l == negativeClassLabel))
 
     var predictedPositives = 0
     var predictedNegatives = 0
@@ -116,14 +118,14 @@ F2 Score: $f2Score
     var falseNeg = 0
 
     predictions.zip(labels).foreach { case (p, l) =>
-      if (p == positiveClass) {
+      if (p == positiveClassPrediction) {
         predictedPositives += 1
-        if (l == positiveClass) { truePos += 1 }
+        if (l == positiveClassLabel) { truePos += 1 }
         else { falsePos += 1 }
       }
       else {  // p == negativeClass
         predictedNegatives += 1
-        if (l == negativeClass) { trueNeg += 1 }
+        if (l == negativeClassLabel) { trueNeg += 1 }
         else { falseNeg += 1 }
       }
     }
