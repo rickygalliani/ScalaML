@@ -6,7 +6,8 @@
 package op
 
 object LinAlg {
-  def dot(scalar: Double, v: List[Double]): List[Double] = {
+
+  def scalarMultiply(scalar: Double, v: List[Double]): List[Double] = {
     v.map(_ * scalar)
   }
 

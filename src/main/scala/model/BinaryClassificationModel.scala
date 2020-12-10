@@ -16,7 +16,7 @@ abstract class BinaryClassificationModel extends Model[BinaryClassificationExamp
     examples.map(e => BinaryClassificationExample(e))
   }
 
-  protected def learn(examples: List[BinaryClassificationExample]): Unit
+  override protected def learn(examples: List[BinaryClassificationExample]): Unit
 
 }
 
@@ -24,11 +24,11 @@ abstract class UnitBinaryClassificationModel extends Model[UnitBinaryClassificat
 
   override val normalizer: Option[Normalizer] = None
 
-  def cast(examples: List[Example]): List[UnitBinaryClassificationExample] = {
+  override def cast(examples: List[Example]): List[UnitBinaryClassificationExample] = {
     examples.map(e => UnitBinaryClassificationExample(e))
   }
 
-  protected def learn(examples: List[UnitBinaryClassificationExample]): Unit
+  override protected def learn(examples: List[UnitBinaryClassificationExample]): Unit
 
 }
 

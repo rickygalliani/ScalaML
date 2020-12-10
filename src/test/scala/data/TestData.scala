@@ -28,7 +28,7 @@ object TestData {
   def generateUnitBinaryClassificationExamples(numExamples: Int,
                                                numOutliers: Int): List[UnitBinaryClassificationExample] = {
     generateBinaryClassificationExamples(numExamples, numOutliers)
-      .map(e => UnitBinaryClassificationExample(new Example(e.X, if (e.y == 0) -1 else 1)))
+      .map(e => UnitBinaryClassificationExample(new Example(e.X, e.y)))
   }
   
 }

@@ -1,4 +1,4 @@
-- Add unit tests for logistic regression
+- Add verbose flag for all models to toggle logging on/off during training
 - Add decision tree
 - Add support vector machine
 - Add printMetadata() function for each model
