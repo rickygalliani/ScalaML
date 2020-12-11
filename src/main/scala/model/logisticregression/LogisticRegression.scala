@@ -5,20 +5,22 @@
 
 package model.logisticregression
 
-import data.normalize.{Normalizer, MinMaxNormalizer}
+import data.normalize.{MinMaxNormalizer, Normalizer}
 import example.BinaryClassificationExample
 import model.BinaryClassificationModel
 import op.LinAlg.{dot, scalarMultiply}
+import org.apache.logging.log4j.Level
 
 import scala.util.Random
 
 class LogisticRegression(var weights: List[Double] = List[Double](),
                          val epochs: Int = Epochs,
                          val learningRate: Double = LearningRate,
-                         val verbose: Boolean = false) extends BinaryClassificationModel {
+                         override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer()),
+                         override val verbose: Boolean = false) extends BinaryClassificationModel {
 
   private val random = new Random
-  override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer())
+  val lr: Level = Level.forName("logisticregression", LogLevelSeed)
 
   override def learn(examples: List[BinaryClassificationExample]): Unit = {
     random.setSeed(TrainSeed)
@@ -38,7 +40,7 @@ class LogisticRegression(var weights: List[Double] = List[Double](),
       cost /= numExamples
       grad = grad.map(_ / numExamples)
       weights = weights.zip(grad).map { case (w, dw) => w - learningRate * dw }
-      if (epoch % 100 == 0 && verbose) { println(s"Epoch: $epoch, Cost: $cost") }
+      if (epoch % LogFrequency == 0 && verbose) { logger(lr, s"Epoch: $epoch, Cost: $cost") }
     }
   }
 

@@ -6,6 +6,8 @@
 package model
 
 package object logisticregression {
+  val LogLevelSeed: Int = 55
+  val LogFrequency: Int = 100  // 1 log for every _ epochs
   val TrainSeed: Int = 27
   val Epochs: Int = 7500
   val LearningRate: Double = 0.01

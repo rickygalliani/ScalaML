@@ -5,16 +5,21 @@
 
 package model.perceptron
 
+import data.normalize.{MinMaxNormalizer, Normalizer}
 import example.{Example, UnitBinaryClassificationExample}
 import model.UnitBinaryClassificationModel
+import org.apache.logging.log4j.Level
 
 import scala.annotation.tailrec
 import scala.util.Random
 
 class Perceptron(var weights: List[Double] = List[Double](),
-                 val maxEpochs: Int = MaxEpochs) extends UnitBinaryClassificationModel {
+                 val maxEpochs: Int = MaxEpochs,
+                 override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer()),
+                 override val verbose: Boolean = false) extends UnitBinaryClassificationModel {
 
   private val random = new Random
+  val pn: Level = Level.forName("perceptron", LogLevelSeed)
 
   override def learn(examples: List[UnitBinaryClassificationExample]): Unit = {
 
@@ -39,6 +44,7 @@ class Perceptron(var weights: List[Double] = List[Double](),
           val dw = (List(1.0) ::: randomMistake.X).map(d => d * randomMistake.y)
           // Update weights: w = w + x * y where (x, y) is a random misclassified example
           weights = weights.zip(dw).map { case (w, d) => w + d }
+          if (epoch % LogFrequency == 0 && verbose) { logger(pn, s"Epoch: $epoch, Mistakes: $numMistakes") }
           trainEpoch(epoch + 1, newPocketWeights, newPocketMistakes)
         }
       }

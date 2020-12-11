@@ -5,17 +5,22 @@
 
 package model.votedperceptron
 
+import data.normalize.{MinMaxNormalizer, Normalizer}
 import example.UnitBinaryClassificationExample
 import model.UnitBinaryClassificationModel
-import model.perceptron.Perceptron
+import model.perceptron.{LogLevelSeed, Perceptron}
+import org.apache.logging.log4j.Level
 
 import scala.annotation.tailrec
 import scala.util.Random
 
 class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Double], Double)](),
-                      val maxEpochs: Int = MaxEpochs) extends UnitBinaryClassificationModel {
+                      val maxEpochs: Int = MaxEpochs,
+                      override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer()),
+                      override val verbose: Boolean = false) extends UnitBinaryClassificationModel {
 
   private val random = new Random
+  val vp: Level = Level.forName("votedperceptron", LogLevelSeed)
 
   /**
    * Implements the Voted model.perceptron.Perceptron learning algorithm:
@@ -47,22 +52,20 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
           // Update current weights: w = w + x * y where (x, y) is a random misclassified example
           val mistakes = Perceptron.misclassifiedExamples(curWeights, examples)
           val numMistakes = mistakes.size
-          if (numMistakes == 0) { weights = pocketWeightVotes.getFinalWeights }
-          else {
-            val randomMistake = mistakes(random.nextInt(numMistakes))
-            val dw = (List(1.0) ::: randomMistake.X).map(_ * randomMistake.y)
-            val newWeights = curWeights.zip(dw).map { case (w, d) => w + d }
-            // Add current weights to set of past weights
-            val newWeightVotes = {
-              if (curVotes == 0) { pocketWeightVotes }
-              else {
-                val newPocketWeights = newWeights :: curWeights :: pocketWeightVotes.weights.tail
-                val newPocketVotes = 0 :: curVotes :: pocketWeightVotes.votes.tail
-                WeightVotes(newPocketWeights, newPocketVotes)
-              }
+          val randomMistake = mistakes(random.nextInt(numMistakes))
+          val dw = (List(1.0) ::: randomMistake.X).map(_ * randomMistake.y)
+          val newWeights = curWeights.zip(dw).map { case (w, d) => w + d }
+          // Add current weights to set of past weights
+          val newWeightVotes = {
+            if (curVotes == 0) { pocketWeightVotes }
+            else {
+              val newPocketWeights = newWeights :: curWeights :: pocketWeightVotes.weights.tail
+              val newPocketVotes = 0 :: curVotes :: pocketWeightVotes.votes.tail
+              WeightVotes(newPocketWeights, newPocketVotes)
             }
-            trainEpoch(epoch + 1, newWeightVotes)
           }
+          if (epoch % LogFrequency == 0 && verbose) { logger(vp, s"Epoch: $epoch, Mistakes: $numMistakes") }
+          trainEpoch(epoch + 1, newWeightVotes)
         }
       }
     }

@@ -7,8 +7,10 @@ package model
 
 import data.normalize.Normalizer
 import example.Example
+import org.apache.logging.log4j.scala.Logging
 
-abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None) {
+abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None,
+                                   val verbose: Boolean = false) extends Logging {
 
   /**
    * Private interface for feature normalization used before training and prediction

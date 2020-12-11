@@ -8,7 +8,8 @@ package model
 import data.normalize.{Normalizer, MinMaxNormalizer}
 import example.{BinaryClassificationExample, Example, UnitBinaryClassificationExample}
 
-abstract class BinaryClassificationModel extends Model[BinaryClassificationExample] {
+abstract class BinaryClassificationModel(override val verbose: Boolean = false)
+  extends Model[BinaryClassificationExample] {
 
   override val normalizer: Option[Normalizer] = None
 

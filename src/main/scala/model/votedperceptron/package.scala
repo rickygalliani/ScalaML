@@ -6,6 +6,7 @@
 package model
 
 package object votedperceptron {
+  val LogFrequency: Int = 100  // 1 log for every _ epochs
   val TrainSeed: Int = 42
   val MaxEpochs: Int = 1000
 }

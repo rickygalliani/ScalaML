@@ -44,7 +44,7 @@ Test Examples: ${testExamples.length}
 """)
 
     // Perceptron
-    val perceptron = new Perceptron()
+    val perceptron = new Perceptron(verbose = true)
     perceptron.train(trainExamples)
     val pTrPredictions = perceptron.predictBatch(trainX)
     val pTsPredictions = perceptron.predictBatch(testX)
@@ -55,7 +55,7 @@ Test Examples: ${testExamples.length}
     )
 
     // VotedPerceptron
-    val votedPerceptron = new VotedPerceptron()
+    val votedPerceptron = new VotedPerceptron(verbose = true)
     votedPerceptron.train(trainExamples)
     val vpTrPredictions = votedPerceptron.predictBatch(trainX)
     val vpTsPredictions = votedPerceptron.predictBatch(testX)
@@ -66,7 +66,7 @@ Test Examples: ${testExamples.length}
     )
 
     // LogisticRegression
-    val logisticRegression = new LogisticRegression()
+    val logisticRegression = new LogisticRegression(verbose = true)
     logisticRegression.train(trainExamples)
     val lrTrPredictions = logisticRegression.predictBatch(trainX).map(p => if (p > 0.6) 1.0 else 0.0)
     val lrTsPredictions = logisticRegression.predictBatch(testX).map(p => if (p > 0.6) 1.0 else 0.0)
