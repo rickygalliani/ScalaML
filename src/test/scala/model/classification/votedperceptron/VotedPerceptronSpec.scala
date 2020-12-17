@@ -3,7 +3,7 @@
  * Email: pjgalliani@gmail.com
  */
 
-package model.votedperceptron
+package model.classification.votedperceptron
 
 import org.scalatest.funsuite.AnyFunSuite
   

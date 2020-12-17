@@ -3,7 +3,7 @@
  * Email: pjgalliani@gmail.com
  */
 
-package model.perceptron
+package model.classification.perceptron
 
 import data.normalize.{MinMaxNormalizer, Normalizer}
 import example.{Example, UnitBinaryClassificationExample}

@@ -3,7 +3,7 @@
  * Email: pjgalliani@gmail.com
  */
 
-package model.logisticregression
+package model.classification.logisticregression
 
 import data.normalize.{MinMaxNormalizer, Normalizer}
 import example.BinaryClassificationExample
@@ -27,7 +27,6 @@ class LogisticRegression(var weights: List[Double] = List[Double](),
     random.shuffle(examples)
     val numExamples = examples.size
     weights = List.fill(examples.head.X.length + 1)(0.0)
-
     (1 to epochs).foreach { epoch =>
       var cost = 0.0
       var grad = List.fill(examples.head.X.length + 1)(0.0)

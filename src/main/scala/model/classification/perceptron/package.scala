@@ -3,10 +3,11 @@
  * Email: pjgalliani@gmail.com
  */
 
-package model
+package model.classification
 
-package object votedperceptron {
+package object perceptron {
+  val LogLevelSeed: Int = 56
   val LogFrequency: Int = 100  // 1 log for every _ epochs
-  val TrainSeed: Int = 42
+  val TrainSeed: Int = 21
   val MaxEpochs: Int = 1000
 }

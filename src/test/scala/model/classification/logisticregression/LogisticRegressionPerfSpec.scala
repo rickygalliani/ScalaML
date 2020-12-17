@@ -3,7 +3,7 @@
  * Email: pjgalliani@gmail.com
  */
 
-package model.logisticregression
+package model.classification.logisticregression
 
 import data.TestData
 import example.BinaryClassificationExample
@@ -22,7 +22,7 @@ object LogisticRegressionPerfSpec extends Bench.LocalTime {
 
   val Examples: List[BinaryClassificationExample] = TestData.generateBinaryClassificationExamples(MaxSize, 0)
 
-  performance of "model.logisticregression.LogisticRegression" in {
+  performance of "model.classification.decisiontree.logisticregression.LogisticRegression" in {
     measure method "learn" in {
       using(TestSizes) in { numExamples =>
         val lr = new LogisticRegression(epochs = NumEpochs, verbose = false)

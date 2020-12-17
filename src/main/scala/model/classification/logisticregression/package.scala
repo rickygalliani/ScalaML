@@ -3,7 +3,7 @@
  * Email: pjgalliani@gmail.com
  */
 
-package model
+package model.classification
 
 package object logisticregression {
   val LogLevelSeed: Int = 55

@@ -3,12 +3,12 @@
  * Email: pjgalliani@gmail.com
  */
 
-package model.votedperceptron
+package model.classification.votedperceptron
 
 import data.normalize.{MinMaxNormalizer, Normalizer}
 import example.UnitBinaryClassificationExample
 import model.UnitBinaryClassificationModel
-import model.perceptron.{LogLevelSeed, Perceptron}
+import model.classification.perceptron.{LogLevelSeed, Perceptron}
 import org.apache.logging.log4j.Level
 
 import scala.annotation.tailrec
@@ -23,7 +23,7 @@ class VotedPerceptron(var weights: List[(List[Double], Double)] = List[(List[Dou
   val vp: Level = Level.forName("votedperceptron", LogLevelSeed)
 
   /**
-   * Implements the Voted model.perceptron.Perceptron learning algorithm:
+   * Implements the Voted model.classification.perceptron.Perceptron learning algorithm:
    * - http://curtis.ml.cmu.edu/w/courses/index.php/Voted_Perceptron
    */
   override def learn(examples: List[UnitBinaryClassificationExample]): Unit = {
