@@ -7,7 +7,7 @@ import Config.LogLevelSeed
 import data.Data.loadCSVExamples
 import data.Split.trainTestSplit
 import model.classification.decisiontree.DecisionTreeClassifier
-import model.classification.decisiontree.logisticregression.LogisticRegression
+import model.classification.logisticregression.LogisticRegression
 import model.classification.perceptron.Perceptron
 import model.classification.votedperceptron.VotedPerceptron
 import org.apache.logging.log4j.Level

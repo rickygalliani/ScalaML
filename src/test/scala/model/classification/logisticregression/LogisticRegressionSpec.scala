@@ -3,7 +3,7 @@
  * Email: pjgalliani@gmail.com
  */
 
-package model.classification.decisiontree.logisticregression
+package model.classification.logisticregression
 
 import org.scalatest.funsuite.AnyFunSuite
 

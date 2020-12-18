@@ -8,8 +8,9 @@ package model.classification
 package object decisiontree {
   val LogLevelSeed: Int = 51
   val TrainSeed: Int = 71
+  val EqualityDelta: Double = 10e-6
   val MaxDepth: Int = 5
   val EntropyEpsilon: Double = 0.01
-  val NumThresholds = 3
+  val NumThresholds = 20
   val Thresholds: List[Double] = (1 to NumThresholds).map(x => 1.0 * x / (NumThresholds + 1)).toList
 }

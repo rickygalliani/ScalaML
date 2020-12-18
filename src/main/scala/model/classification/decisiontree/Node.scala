@@ -13,6 +13,10 @@ abstract class Node(val depth: Int,
                     var rightChild: Option[Node]) {
   def isLeaf: Boolean
   def evaluate(X: List[Double]): Double  // >= / < threshold (1.0 / 0.0) or terminal value
+  def isLeftChild: Boolean = parent.exists(p => p.leftChild.get == this)
+  def isRightChild: Boolean = parent.exists(p => p.rightChild.get == this)
+  def updateLeftChild(leftChild: Node): Unit = this.leftChild = Option(leftChild)
+  def updateRightChild(rightChild: Node): Unit = this.rightChild = Option(rightChild)
 
   /**
    * Used to determine which features this Node can split on
@@ -50,6 +54,9 @@ class LeafNode(depth: Int, parent: Option[NonLeafNode], terminalValue: Option[Do
 
   def isLeaf: Boolean = true
 
-  def evaluate(X: List[Double]): Double = terminalValue.getOrElse(-1.0)
+  def evaluate(X: List[Double]): Double = {
+    if (terminalValue.isEmpty) { throw new Exception("Undefined terminal value for leaf node at inference time") }
+    else { terminalValue.get }
+  }
 
 }
