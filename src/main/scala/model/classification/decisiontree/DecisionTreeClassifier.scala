@@ -8,10 +8,11 @@ package model.classification.decisiontree
 import data.normalize.{MinMaxNormalizer, Normalizer}
 import example.BinaryClassificationExample
 import model.BinaryClassificationModel
-import model.classification.decisiontree.DecisionTreeClassifier.getSplit
+import model.classification.decisiontree.DecisionTreeClassifier.{TrainNode, getSplit}
 import org.apache.logging.log4j.Level
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
@@ -24,10 +25,39 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
 
   override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer())
 
-  def shouldSplitAgain(node: Node, bestSplit: Split, features: List[Int]): Boolean = {
+  def logNode(trainNode: TrainNode, split: Split): Unit = {
+    logger(dtc,
+      s"""\n\nAdded node to decision tree:
+         |\t- depth: ${trainNode.node.depth}
+         |\t- features left: ${trainNode.featureIndices.size}
+         |\t- feature: ${split.featureIndex}
+         |\t- threshold: ${split.threshold}
+         |\t- leftPos: ${split.leftPos}
+         |\t- leftSize: ${split.leftSize}
+         |\t- rightPos: ${split.rightPos}
+         |\t- rightSize: ${split.rightSize}
+         |\t- entropy: ${split.entropy}\n""".stripMargin)
+  }
+
+  def logSplitDecision(someIncorrect: Boolean,
+                       numFeaturesLeft: Int,
+                       featuresLeft: Boolean,
+                       entropyDrop: Double,
+                       entropyDropStillBig: Boolean,
+                       depth: Int,
+                       aboveMaxDepth: Boolean): Unit = {
+    logger(dtc,
+      s"""\n\nStopping condition checks:
+         |\t1) All examples are correct: ${!someIncorrect}
+         |\t2) No features left to split on: ${!featuresLeft} (features left: $numFeaturesLeft)
+         |\t3) Entropy drop below epsilon ($EntropyEpsilon): ${!entropyDropStillBig} ($entropyDrop)
+         |\t4) Below max depth ($MaxDepth): ${!aboveMaxDepth} (node depth: $depth)\n""".stripMargin)
+  }
+
+  def shouldSplitAgain(node: Node, bestSplit: Split, featureIndices: List[Int]): Boolean = {
     val someIncorrect = bestSplit.entropy > EqualityDelta
-    val numFeaturesLeft = features.toSet.diff(Set(bestSplit.featureIndex)).size
-    val featuresLeft = numFeaturesLeft > 0
+    val numFeaturesLeft = featureIndices.size
+    val featuresLeft = numFeaturesLeft > 1  // will remove current feature we split again
     val entropyDrop = node.parent match {
       case Some(p) => p.split.get.entropy - bestSplit.entropy
       case None => EntropyEpsilon + 0.1
@@ -36,12 +66,15 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
     val aboveMaxDepth = node.depth < MaxDepth
     val shouldSplitAgain = Seq(someIncorrect, featuresLeft, entropyDropStillBig, aboveMaxDepth).forall(identity)
     if (!shouldSplitAgain && verbose) {
-      logger(dtc,
-        s"""\n\nStopping condition checks:
-          |\t1) All examples are correct: ${!someIncorrect}
-          |\t2) No features left to split on: ${!featuresLeft} (features left: $numFeaturesLeft)
-          |\t3) Entropy drop below epsilon ($EntropyEpsilon): ${!entropyDropStillBig} ($entropyDrop)
-          |\t4) Below max depth ($MaxDepth): ${!aboveMaxDepth} (node depth: ${node.depth})\n""".stripMargin)
+      logSplitDecision(
+        someIncorrect,
+        numFeaturesLeft,
+        featuresLeft,
+        entropyDrop,
+        entropyDropStillBig,
+        node.depth,
+        aboveMaxDepth
+      )
     }
     shouldSplitAgain
   }
@@ -51,43 +84,33 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
     random.setSeed(TrainSeed)
     random.shuffle(examples)
     val featureIndices: List[Int] = examples.head.X.indices.toList
-    val nodes: mutable.Queue[Node] = mutable.Queue[Node](root)
-    while(nodes.nonEmpty) {
-      val node = nodes.dequeue
-      val features = node.unusedFeatures(featureIndices) // Only use features not used in parent nodes
+    val trainNodes = mutable.Queue(TrainNode(root, examples, featureIndices))
+    while(trainNodes.nonEmpty) {
+      val trainNode = trainNodes.dequeue
       // Consider each feature/threshold combination
-      val featureThresholds = for (f <- features; t <- Thresholds) yield (f, t)
-      var bestSplit = getSplit(examples, featureThresholds.head._1, featureThresholds.head._2)
+      val featureThresholds = for (f <- trainNode.featureIndices; t <- Thresholds) yield (f, t)
+      var bestSplit = getSplit(trainNode.examples, featureThresholds.head._1, featureThresholds.head._2)
       featureThresholds.tail.foreach { case (feature, threshold) =>
-        // TODO(ricky): need to filter for only examples that get to this node!
-        val split = getSplit(examples, feature, threshold)
+        val split = getSplit(trainNode.examples, feature, threshold)
         if (split.entropy < bestSplit.entropy) bestSplit = split
       }
-      if (verbose) {
-        logger(dtc,
-          s"""\n\nAdded node to decision tree:
-          |\t- depth: ${node.depth}
-          |\t- feature: ${bestSplit.featureIndex}
-          |\t- threshold: ${bestSplit.threshold}
-          |\t- leftPos: ${bestSplit.leftPos}
-          |\t- leftSize: ${bestSplit.leftSize}
-          |\t- rightPos: ${bestSplit.rightPos}
-          |\t- rightSize: ${bestSplit.rightSize}
-          |\t- entropy: ${bestSplit.entropy}\n""".stripMargin)
-      }
-      if (shouldSplitAgain(node, bestSplit, features)) {
+      if (verbose) { logNode(trainNode, bestSplit) }
+      if (shouldSplitAgain(trainNode.node, bestSplit, trainNode.featureIndices)) {
         // Change current node from leaf node to non-leaf node
-        val nonLeafNode = new NonLeafNode(node.depth, node.parent, None, None, Option(bestSplit))
+        val nonLeafNode = new NonLeafNode(trainNode.node.depth, trainNode.node.parent, None, None, Option(bestSplit))
         // Update parent to point to the new non-leaf
-        if (node.isLeftChild) { node.parent.get.updateLeftChild(nonLeafNode) }
-        else if (node.isRightChild) { node.parent.get.updateRightChild(nonLeafNode) }
+        if (trainNode.node.isLeftChild) { trainNode.node.parent.get.updateLeftChild(nonLeafNode) }
+        else if (trainNode.node.isRightChild) { trainNode.node.parent.get.updateRightChild(nonLeafNode) }
         // Create new children nodes for current node
         val leftChild = new LeafNode(nonLeafNode.depth + 1, Option(nonLeafNode), Option(bestSplit.leftYHat))
         val rightChild = new LeafNode(nonLeafNode.depth + 1, Option(nonLeafNode), Option(bestSplit.rightYHat))
         nonLeafNode.updateLeftChild(leftChild)
         nonLeafNode.updateRightChild(rightChild)
-        nodes.addAll(Seq(leftChild, rightChild))
-        if (node == root) { root = nonLeafNode }
+        val downstreamFeatures = trainNode.featureIndices.toSet.diff(Set(bestSplit.featureIndex)).toList
+        val leftTrainNode = TrainNode(leftChild, bestSplit.leftExamples, downstreamFeatures)
+        val rightTrainNode = TrainNode(rightChild, bestSplit.rightExamples, downstreamFeatures)
+        trainNodes.addAll(Seq(leftTrainNode, rightTrainNode))
+        if (trainNode.node == root) { root = nonLeafNode }
       }
     }
   }
@@ -107,18 +130,24 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
 
 object DecisionTreeClassifier {
 
+  case class TrainNode(node: Node, examples: List[BinaryClassificationExample], featureIndices: List[Int])
+
   def getSplit(examples: List[BinaryClassificationExample], featureIndex: Int, threshold: Double): Split = {
+    var leftExamples = new ListBuffer[BinaryClassificationExample]
+    var rightExamples = new ListBuffer[BinaryClassificationExample]
     var (leftPos, leftSize, rightPos, rightSize) = (0, 0, 0, 0)
     examples.foreach { example =>
       if (example.X(featureIndex) >= threshold) {
+        leftExamples += example
         rightPos += example.y.toInt
         rightSize += 1
       } else {
+        rightExamples += example
         leftPos += example.y.toInt
         leftSize += 1
       }
     }
-    Split(featureIndex, threshold, leftPos, rightPos, leftSize, rightSize)
+    Split(featureIndex, threshold, leftExamples.toList, rightExamples.toList, leftPos, rightPos, leftSize, rightSize)
   }
 
   def entropy(yHat: Double): Double = {

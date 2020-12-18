@@ -29,27 +29,4 @@ class NodeSpec extends AnyFunSuite {
     assert(rc.isRightChild)
   }
 
-  test("unusedFeatures(): case 1") {
-    val pos = 3
-    val size = 5
-    val rootSplit = Split(
-      featureIndex = 1,
-      threshold = 0.5,
-      leftPos = pos,
-      rightPos = pos,
-      leftSize = size,
-      rightSize = size
-    )
-    val root = new NonLeafNode(1, parent = None, leftChild = None, rightChild = None, Option(rootSplit))
-    val lc = new LeafNode(depth = 2, parent = Option(root), terminalValue = Option(0.5))
-    val rc = new LeafNode(depth = 2, parent = Option(root), terminalValue = Option(0.5))
-    root.updateLeftChild(lc)
-    root.updateRightChild(rc)
-    val featureIndices = List(0.0, 1.0, 2.0, 3.0, 4.0).map(_.toInt)
-    val unusedFeaturesLeftChildTest = lc.unusedFeatures(featureIndices = featureIndices)
-    val unusedFeaturesRightChildTest = rc.unusedFeatures(featureIndices = featureIndices)
-    assert(unusedFeaturesLeftChildTest == List(0.0, 2.0, 3.0, 4.0).map(_.toInt))  // to avoid magic number warning
-    assert(unusedFeaturesRightChildTest == List(0.0, 2.0, 3.0, 4.0).map(_.toInt))
-  }
-
 }

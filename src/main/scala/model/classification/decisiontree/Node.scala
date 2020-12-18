@@ -5,8 +5,6 @@
 
 package model.classification.decisiontree
 
-import scala.collection.mutable.ListBuffer
-
 abstract class Node(val depth: Int,
                     val parent: Option[NonLeafNode],
                     var leftChild: Option[Node],
@@ -18,20 +16,6 @@ abstract class Node(val depth: Int,
   def updateLeftChild(leftChild: Node): Unit = this.leftChild = Option(leftChild)
   def updateRightChild(rightChild: Node): Unit = this.rightChild = Option(rightChild)
 
-  /**
-   * Used to determine which features this Node can split on
-   * @param featureIndices features from which to choose
-   * @return features not used by "parents" of this Node
-   */
-  def unusedFeatures(featureIndices: List[Int]): List[Int] = {
-    val parentFeatures = new ListBuffer[Int]()
-    var p = parent
-    while (p.nonEmpty) {
-      parentFeatures += p.get.split.get.featureIndex
-      p = p.get.parent
-    }
-    featureIndices.toSet.diff(parentFeatures.toSet).toList.sorted
-  }
 }
 
 class NonLeafNode(depth: Int,

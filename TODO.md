@@ -1,4 +1,6 @@
-- Add decision tree
+- Fix decision tree entropy drop bug
+- Add edge case tests for decision tree (empty training set, shouldSplitAgain, etc.)
+- Test out decision tree with different hyper-parameters
 - Add support vector machine
 - Add printMetadata() function for each model
 - Add linear regression
