@@ -10,7 +10,7 @@ package object decisiontree {
   val TrainSeed: Int = 71
   val EqualityDelta: Double = 10e-6
   val MaxDepth: Int = 4
-  val EntropyEpsilon: Double = 0.01
+  val EntropyDropEpsilon: Double = 0.01
   val NumThresholds = 20
   val Thresholds: List[Double] = (1 to NumThresholds).map(x => 1.0 * x / (NumThresholds + 1)).toList
 }
