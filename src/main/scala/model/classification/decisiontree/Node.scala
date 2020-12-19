@@ -27,8 +27,9 @@ class NonLeafNode(depth: Int,
   def isLeaf: Boolean = false
 
   def evaluate(X: List[Double]): Double = {
-    assert(X.indices.contains(split.get.featureIndex))
-    if (X(split.get.featureIndex) >= split.get.threshold) 1.0 else 0.0
+    val featureIndex = split.get.featureIndex
+    if (!X.indices.contains(featureIndex)) throw new Exception(s"Unrecognized feature index $featureIndex")
+    if (X(featureIndex) >= split.get.threshold) 1.0 else 0.0
   }
 
 }
@@ -40,7 +41,10 @@ class LeafNode(depth: Int, parent: Option[NonLeafNode], terminalValue: Option[Do
 
   def evaluate(X: List[Double]): Double = {
     if (terminalValue.isEmpty) { throw new Exception("Undefined terminal value for leaf node at inference time") }
-    else { terminalValue.get }
+    else {
+      println(s"idk here with terminalValue.get = ${terminalValue.get}")
+      terminalValue.get
+    }
   }
 
 }

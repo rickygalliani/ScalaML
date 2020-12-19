@@ -14,7 +14,7 @@ object Split {
   private val random = new Random
   random.setSeed(SplitSeed)
 
-  def trainTestSplit(examples: List[Example], trainFraction: Double = 0.8): (List[Example], List[Example]) = {
+  def trainTestSplit(examples: List[Example], trainFraction: Double = 0.65): (List[Example], List[Example]) = {
     random.shuffle(examples)
     val numExamples = examples.size
     val numTrainExamples = (numExamples * trainFraction).toInt

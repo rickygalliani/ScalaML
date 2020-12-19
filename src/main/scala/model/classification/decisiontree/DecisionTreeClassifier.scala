@@ -14,7 +14,6 @@ import scala.collection.mutable
 import scala.util.Random
 
 class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
-                             val entropyDropEpsilon: Double = EntropyDropEpsilon,
                              override val verbose: Boolean = false) extends BinaryClassificationModel {
 
   private val random = new Random
@@ -24,29 +23,20 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
 
   override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer())
 
-  def shouldSplitAgain(node: Node, bestSplit: Split, featureIndices: List[Int]): Boolean = {
+  // Return true if the algorithm should stop, false otherwise
+  def evaluateStoppingCriteria(node: Node, bestSplit: Split, featureIndices: List[Int]): Boolean = {
     val someIncorrect = bestSplit.entropy > EqualityDelta
+    val nonEmptySplit = bestSplit.size > 0
     val numFeaturesLeft = featureIndices.size
     val featuresLeft = numFeaturesLeft > 1  // will remove current feature we split again
-    val entropyDrop = node.parent match {
-      case Some(p) => p.split.get.entropy - bestSplit.entropy
-      case None => entropyDropEpsilon + 0.1
-    }
-    val entropyDropStillBig = true // entropyDrop >= EntropyEpsilon
-    val aboveMaxDepth = node.depth < MaxDepth
-    val shouldSplitAgain = Seq(someIncorrect, featuresLeft, entropyDropStillBig, aboveMaxDepth).forall(identity)
-    if (!shouldSplitAgain && verbose) {
-      logSplitDecision(
-        someIncorrect,
-        numFeaturesLeft,
-        featuresLeft,
-        entropyDrop,
-        entropyDropStillBig,
-        node.depth,
-        aboveMaxDepth
+    val aboveMaxDepth = node.depth < maxDepth
+    val stop = !Seq(someIncorrect, nonEmptySplit, featuresLeft, aboveMaxDepth).forall(identity)
+    if (verbose) {
+      logStopDecision(
+        someIncorrect, nonEmptySplit, numFeaturesLeft, featuresLeft, node.depth, maxDepth, aboveMaxDepth, stop
       )
     }
-    shouldSplitAgain
+    stop
   }
 
   // Implements the ID3 learning algorithm
@@ -65,7 +55,8 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
         if (split.entropy < bestSplit.entropy) bestSplit = split
       }
       if (verbose) { logNode(trainNode, bestSplit) }
-      if (shouldSplitAgain(trainNode.node, bestSplit, trainNode.featureIndices)) {
+      val stop = evaluateStoppingCriteria(trainNode.node, bestSplit, trainNode.featureIndices)
+      if (!stop) {
         // Change current node from leaf node to non-leaf node
         val nonLeafNode = new NonLeafNode(trainNode.node.depth, trainNode.node.parent, None, None, Option(bestSplit))
         // Update parent to point to the new non-leaf version of this node
@@ -84,6 +75,13 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
         val leftTrainNode = TrainNode(leftChild, bestSplit.leftExamples, downstreamFeatures)
         val rightTrainNode = TrainNode(rightChild, bestSplit.rightExamples, downstreamFeatures)
         trainNodes.addAll(Seq(leftTrainNode, rightTrainNode))
+      } else {
+        // Stopping, update the root node with a terminal value, if necessary
+        if (trainNode.node == root) {
+          logger(dtc, s"yHat = ${bestSplit.yHat}")
+          logger(dtc, s"adding terminalValue to root node...")
+          root = new LeafNode(1, None, Option(bestSplit.yHat))
+        }
       }
     }
   }
@@ -113,19 +111,20 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
          |\t- entropy: ${split.entropy}\n""".stripMargin)
   }
 
-  def logSplitDecision(someIncorrect: Boolean,
-                       numFeaturesLeft: Int,
-                       featuresLeft: Boolean,
-                       entropyDrop: Double,
-                       entropyDropStillBig: Boolean,
-                       depth: Int,
-                       aboveMaxDepth: Boolean): Unit = {
+  def logStopDecision(someIncorrect: Boolean,
+                      nonEmptySplit: Boolean,
+                      numFeaturesLeft: Int,
+                      featuresLeft: Boolean,
+                      depth: Int,
+                      maxDepth: Int,
+                      aboveMaxDepth: Boolean,
+                      stop: Boolean): Unit = {
     logger(dtc,
-      s"""\n\nStopping condition checks:
+      s"""\n\nStopping condition checks (stopping: ${stop}):
          |\t1) All examples are correct: ${!someIncorrect}
-         |\t2) No features left to split on: ${!featuresLeft} (features left: $numFeaturesLeft)
-         |\t3) Entropy drop below epsilon ($entropyDropEpsilon): ${!entropyDropStillBig} ($entropyDrop)
-         |\t4) Below max depth ($MaxDepth): ${!aboveMaxDepth} (node depth: $depth)\n""".stripMargin)
+         |\t2) Empty split: ${!nonEmptySplit}
+         |\t3) No features left to split on: ${!featuresLeft} (features left: $numFeaturesLeft)
+         |\t4) Below max depth ($maxDepth): ${!aboveMaxDepth} (node depth: $depth)\n""".stripMargin)
   }
 
 }
