@@ -19,7 +19,7 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
   private val random = new Random
   val dtc: Level = Level.forName("decisiontreeclassifier", LogLevelSeed)
 
-  var root: Node = new LeafNode(1, None)
+  var root: Node = new RootNode
 
   override val normalizer: Option[Normalizer] = Some(new MinMaxNormalizer())
 
@@ -46,42 +46,30 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
     val featureIndices: List[Int] = examples.head.X.indices.toList
     val trainNodes = mutable.Queue(TrainNode(root, examples, featureIndices))
     while(trainNodes.nonEmpty) {
-      val trainNode = trainNodes.dequeue
+      val curNode = trainNodes.dequeue
       // Consider each feature/threshold combination
-      val featureThresholds = for (f <- trainNode.featureIndices; t <- Thresholds) yield (f, t)
-      var bestSplit = Split(trainNode.examples, featureThresholds.head._1, featureThresholds.head._2)
+      val featureThresholds = for (f <- curNode.featureIndices; t <- Thresholds) yield (f, t)
+      var bestSplit = Split(curNode.examples, featureThresholds.head._1, featureThresholds.head._2)
       featureThresholds.tail.foreach { case (feature, threshold) =>
-        val split = Split(trainNode.examples, feature, threshold)
+        val split = Split(curNode.examples, feature, threshold)
         if (split.entropy < bestSplit.entropy) bestSplit = split
       }
-      if (verbose) { logNode(trainNode, bestSplit) }
-      val stop = evaluateStoppingCriteria(trainNode.node, bestSplit, trainNode.featureIndices)
+      if (verbose) { logNode(curNode, bestSplit) }
+      val stop = evaluateStoppingCriteria(curNode.node, bestSplit, curNode.featureIndices)
       if (!stop) {
         // Change current node from leaf node to non-leaf node
-        val nonLeafNode = new NonLeafNode(trainNode.node.depth, trainNode.node.parent, None, None, Option(bestSplit))
-        // Update parent to point to the new non-leaf version of this node
-        if (trainNode.node.isLeftChild) { trainNode.node.parent.get.updateLeftChild(nonLeafNode) }
-        else if (trainNode.node.isRightChild) { trainNode.node.parent.get.updateRightChild(nonLeafNode) }
-        // Create new children nodes for current node
-        val leftChild = new LeafNode(nonLeafNode.depth + 1, Option(nonLeafNode), Option(bestSplit.leftYHat))
-        val rightChild = new LeafNode(nonLeafNode.depth + 1, Option(nonLeafNode), Option(bestSplit.rightYHat))
-        // Point this node to new children
-        nonLeafNode.updateLeftChild(leftChild)
-        nonLeafNode.updateRightChild(rightChild)
+        val nonLeafNode = new NonLeafNode(curNode.node.depth, curNode.node.parent, split = Option(bestSplit))
+        val (leftChild, rightChild) = nonLeafNode.getChildren(bestSplit.leftYHat, bestSplit.rightYHat)
         // Update the root node of the tree, if necessary
-        if (trainNode.node == root) { root = nonLeafNode }
+        if (curNode.node == root) { root = nonLeafNode }
         // Eliminate current feature from set of features for downstream nodes
-        val downstreamFeatures = trainNode.featureIndices.toSet.diff(Set(bestSplit.featureIndex)).toList
+        val downstreamFeatures = curNode.featureIndices.toSet.diff(Set(bestSplit.featureIndex)).toList
         val leftTrainNode = TrainNode(leftChild, bestSplit.leftExamples, downstreamFeatures)
         val rightTrainNode = TrainNode(rightChild, bestSplit.rightExamples, downstreamFeatures)
         trainNodes.addAll(Seq(leftTrainNode, rightTrainNode))
       } else {
         // Stopping, update the root node with a terminal value, if necessary
-        if (trainNode.node == root) {
-          logger(dtc, s"yHat = ${bestSplit.yHat}")
-          logger(dtc, s"adding terminalValue to root node...")
-          root = new LeafNode(1, None, Option(bestSplit.yHat))
-        }
+        if (curNode.node == root) root = new LeafNode(1, None, Option(bestSplit.yHat))
       }
     }
   }
@@ -120,7 +108,7 @@ class DecisionTreeClassifier(val maxDepth: Int = MaxDepth,
                       aboveMaxDepth: Boolean,
                       stop: Boolean): Unit = {
     logger(dtc,
-      s"""\n\nStopping condition checks (stopping: ${stop}):
+      s"""\n\nStopping condition checks (stopping: $stop):
          |\t1) All examples are correct: ${!someIncorrect}
          |\t2) Empty split: ${!nonEmptySplit}
          |\t3) No features left to split on: ${!featuresLeft} (features left: $numFeaturesLeft)

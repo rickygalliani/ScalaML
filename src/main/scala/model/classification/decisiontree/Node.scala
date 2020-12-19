@@ -11,15 +11,31 @@ abstract class Node(val depth: Int,
                     var rightChild: Option[Node]) {
   def isLeaf: Boolean
   def evaluate(X: List[Double]): Double  // >= / < threshold (1.0 / 0.0) or terminal value
-  def isLeftChild: Boolean = parent.exists(p => p.leftChild.get == this)
-  def isRightChild: Boolean = parent.exists(p => p.rightChild.get == this)
+  def isLeftChild: Boolean = {
+    parent match {
+      case Some(p) => p.leftChild match {
+        case Some(lc) => lc == this
+        case None => false
+      }
+      case None => false
+    }
+  }
+  def isRightChild: Boolean = {
+    parent match {
+      case Some(p) => p.rightChild match {
+        case Some(rc) => rc == this
+        case None => false
+      }
+      case None => false
+    }
+  }
   def updateLeftChild(leftChild: Node): Unit = this.leftChild = Option(leftChild)
   def updateRightChild(rightChild: Node): Unit = this.rightChild = Option(rightChild)
 
 }
 
-class NonLeafNode(depth: Int,
-                  parent: Option[NonLeafNode],
+class NonLeafNode(override val depth: Int,
+                  override val parent: Option[NonLeafNode],
                   leftChild: Option[Node] = None,
                   rightChild: Option[Node] = None,
                   var split: Option[Split] = None) extends Node(depth, parent, leftChild, rightChild) {
@@ -32,19 +48,34 @@ class NonLeafNode(depth: Int,
     if (X(featureIndex) >= split.get.threshold) 1.0 else 0.0
   }
 
+  def getChildren(leftYHat: Double, rightYHat: Double): (LeafNode, LeafNode) = {
+    // Create new children nodes for current node
+    val leftChild = new LeafNode(depth + 1, Option(this), Option(leftYHat))
+    val rightChild = new LeafNode(depth + 1, Option(this), Option(rightYHat))
+    // Point this Node to new children
+    this.updateLeftChild(leftChild)
+    this.updateRightChild(rightChild)
+    (leftChild, rightChild)
+  }
+
 }
 
-class LeafNode(depth: Int, parent: Option[NonLeafNode], terminalValue: Option[Double] = None)
+class RootNode extends NonLeafNode(depth = 1, parent = None, leftChild = None, rightChild = None)
+
+class LeafNode(override val depth: Int,
+               override val parent: Option[NonLeafNode],
+               val terminalValue: Option[Double] = None)
   extends Node(depth, parent, leftChild = None, rightChild = None) {
+
+  // Make sure parent points to this Node
+  if (this.isLeftChild) { parent.foreach(p => p.updateLeftChild(this)) }
+  else if (this.isRightChild) { parent.foreach(p => p.updateRightChild(this)) }
 
   def isLeaf: Boolean = true
 
   def evaluate(X: List[Double]): Double = {
     if (terminalValue.isEmpty) { throw new Exception("Undefined terminal value for leaf node at inference time") }
-    else {
-      println(s"idk here with terminalValue.get = ${terminalValue.get}")
-      terminalValue.get
-    }
+    else { terminalValue.get }
   }
 
 }

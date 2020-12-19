@@ -68,7 +68,14 @@ abstract class Model[T <: Example](val normalizer: Option[Normalizer] = None,
    *
    * @param examples a list of examples, unprocessed
    */
-  final def train(examples: List[Example]): Unit = learn(preprocess(examples))
+  final def train(examples: List[Example]): Unit = {
+    if (examples.isEmpty) {
+      throw new IllegalArgumentException("Must pass examples to train model")
+    }
+    else {
+      learn(preprocess(examples))
+    }
+  }
 
   /**
    * Public interface for model inference on a single feature vector

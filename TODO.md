@@ -1,8 +1,7 @@
-- Fix decision tree entropy drop bug
-- Add edge case tests for decision tree (empty training set, shouldSplitAgain, etc.)
-- Test out decision tree with different hyper-parameters
 - Add support vector machine
 - Add printMetadata() function for each model
 - Add linear regression
 - Create class to store metadata for datasets (add printMetadata() function)
+- Add more pre-processing techniques (i.e., upsampling, downsampling)
+- Add feature transformations (i.e., x ** 2, sqrt(x))
 - Write tests for BinaryPerformance functions
